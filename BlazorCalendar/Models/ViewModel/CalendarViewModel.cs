@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BlazorCalendar.Models.ViewModel.Interfaces;
 
 namespace BlazorCalendar.Models.ViewModel
 {
     public class CalendarViewModel
     {
+        public ICalendarView ICalendarViewModel { get; set; }
     }
 }
