@@ -1,0 +1,192 @@
+﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Styles
+
+<div class="dayGrid" style="">
+    @{
+        string CSSbackground = GetBackground(Day);
+        TasksForDay = GetTasksPositionOnDayGrid(Day, TasksList, NumberOfTimeCells);
+        if (TasksForDay is not null && TasksForDay.Length != 0)
+            MaxNumberOfColumnsInDay = TasksForDay.Max(x => x.ColumnStart);
+        else
+            MaxNumberOfColumnsInDay = 1;
+    }
+
+    @for (int dayTime = 0; dayTime < 24 * Multiplyer; dayTime++)
+    {
+        DateTime time = Day.AddMinutes(dayTime * Minutes);
+        int row = dayTime + 1;
+
+        string CSSGridPostion = $"grid-row:{row}; grid-column:1 / span {MaxNumberOfColumnsInDay};";
+
+        <TimeCell DayClick="DayClick"
+                  EmptyDayClick="EmptyDayClick"
+                  Draggable="Draggable"
+                  DropTask="DropTask"
+                  Time="time"
+                  CSSbackground="@CSSbackground"
+                  CSSGridPosition="@CSSGridPostion">
+        </TimeCell>
+    }
+
+    @if (TasksForDay is not null)
+    {
+        for (var k = 0; k < TasksForDay.Length; k++)
+        {
+            Tasks t = TasksForDay[k];
+
+            if (t.DateStart.TimeOfDay != TimeSpan.Zero || t.DateEnd.TimeOfDay != TimeSpan.Zero)
+            {
+                if (t.RowEnd - t.RowStart != 0)
+                {
+                    TaskColor = Colors.GetHatching(t.FillStyle, t.Color);
+                    TaskColor = $"{TaskColor};color:{t.ForeColor}";
+
+                    ClassPin = string.IsNullOrWhiteSpace(t.Comment) ? null : " pin";
+                    ClassPointer = " cursor-pointer";
+
+                    string gridRow = $"grid-row: {t.RowStart} / span {t.RowEnd - t.RowStart};";
+                    string gridColumn = $"grid-column-start: {t.ColumnStart};";
+
+                    string CSSGridPoition = $"{gridRow} {gridColumn}";
+
+                    <GridItem ClassPin="@ClassPin"
+                              ClassPointer="@ClassPointer"
+                              CSSGridPosition="@CSSGridPoition"
+                              Day="Day"
+                              Draggable="Draggable"
+                              DragStart="DragStart"
+                              Task="t"
+                              TaskClick="TaskClick"
+                              TaskColor="@TaskColor">
+                    </GridItem>
+                }
+            }
+        }
+    }
+</div>
+
+
+@code {
+
+    public Tasks[]? TasksForDay { get; set; }
+
+    public decimal NumberOfTimeCells { get; set; }
+
+    public int column { get; set; } = 1;
+
+    public string TaskColor { get; set; }
+
+    public string ClassPin { get; set; }
+
+    public string ClassPointer { get; set; }
+
+    [Parameter]
+    public Tasks[] TasksList { get; set; }
+
+    [Parameter]
+    public DateTime Day { get; set; }
+
+    [Parameter]
+    public int Minutes { get; set; }
+
+    [Parameter]
+    public decimal Multiplyer { get; set; }
+
+    [Parameter]
+    public string SaturdayColor { get; set; }
+
+    [Parameter]
+    public string SundayColor { get; set; }
+
+    [Parameter]
+    public string WeekDaysColor { get; set; }
+
+    [Parameter]
+    public bool Draggable { get; set; }
+
+    [Parameter]
+    public TimeDivision TimeDivision { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> EmptyDayClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickTaskParameter> TaskClick { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DragStart { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DropTask { get; set; }
+
+    [Parameter]
+    public int DayNumber { get; set; }
+
+    private async Task HandleDragStart(DragDropParameter dragDropParameter)
+    {
+        await DragStart.InvokeAsync(dragDropParameter);
+    }
+
+    private string GetBackground(DateTime day)
+    {
+        int d = (int)day.DayOfWeek;
+
+        if (d == 6)
+        {
+            return $"background:{SaturdayColor}";
+        }
+        else if (d == 0)
+        {
+            return $"background:{SundayColor}";
+        }
+
+        return $"background:{WeekDaysColor}";
+    }
+
+    public int MaxNumberOfColumnsInDay { get; set; }
+
+    public Tasks[] GetTasksPositionOnDayGrid(DateTime day, Tasks[] tasks, decimal numberOfTimeCells)
+    {
+        List<Tasks> tasksForDate = tasks
+            .Where(task => task.DateStart.Date == day.Date || task.DateEnd.Date == day.Date)
+            .OrderBy(x => x.DateStart)
+            .ThenBy(x => x.DateEnd)
+            .ToList();
+
+        for (int i = 0; i < tasksForDate.Count; i++)
+        {
+            Tasks currentTask = tasksForDate[i];
+
+            if (currentTask.DateStart.TimeOfDay != TimeSpan.Zero || currentTask.DateEnd.TimeOfDay != TimeSpan.Zero)
+            {
+                DateTime taskStartHour = currentTask.DateStart > day ? currentTask.DateStart : day;
+                DateTime taskEndHour = currentTask.DateEnd < day.AddDays(1) ? currentTask.DateEnd : day.AddDays(1);
+
+                TimeSpan duration = taskEndHour - taskStartHour;
+                int rowSpan = (int)Math.Ceiling(duration.TotalMinutes) / Minutes;
+
+                int startRowIndex = (int)((taskStartHour.TimeOfDay.TotalMinutes) / Minutes) + 1;
+                currentTask.RowStart = startRowIndex;
+                currentTask.RowEnd = startRowIndex + rowSpan;
+
+                int nearestColumn = 1;
+                for (int j = i - 1; j >= 0; j--)
+                {
+                    Tasks previousTask = tasksForDate[j];
+                    if (previousTask.RowEnd > currentTask.RowStart)
+                    {
+                        nearestColumn = Math.Max(nearestColumn, previousTask.ColumnStart + 1);
+                    }
+                }
+
+                currentTask.ColumnStart = nearestColumn;
+            }
+        }
+
+        tasksForDate.OrderBy(x => x.DateStart);
+        return tasksForDate.ToArray();
+    }
+}

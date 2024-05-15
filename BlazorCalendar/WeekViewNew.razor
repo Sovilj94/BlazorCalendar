@@ -1,0 +1,124 @@
+﻿@using System.Globalization
+@using BlazorCalendar.Models
+@using BlazorCalendar.Styles
+@using BlazorCalendar.CalendarComponents
+
+@inherits CalendarBase
+
+@{
+    //DateTime FirstDateWeek = new DateTime(FirstDate.Year, FirstDate.Month, FirstDate.Day).AddDays(-(Dates.GetNumOfDay((int)FirstDate.Date.DayOfWeek)));
+    //string[] dayNames = CultureInfo.GetCultureInfo("sr-RS").DateTimeFormat.AbbreviatedDayNames;
+
+    // Get the current culture
+    CultureInfo culture = CultureInfo.CurrentCulture;
+
+    // Calculate the start of the week based on the culture
+    DayOfWeek firstDayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
+    DateTime FirstDateWeek = FirstDate.AddDays(-(FirstDate.DayOfWeek - firstDayOfWeek));
+
+
+    string[] dayNames = { "Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub" };
+    string? isHidden = DisplayedView == DisplayedView.Weekly ? null : "hidden-element";
+    string? CSSbackground = null;
+    string? taskColor = null;
+    string? classPin = null;
+    string? classPointer = null;
+    string borderStyle = "";
+
+    // The sorting must be done each time we redraw in case the user moves the spots
+    if (TasksList is not null)
+    {
+        TasksList = TasksList.OrderBy(x => x.DateStart)
+                             .ThenByDescending(x => x.DateEnd)
+                             .ToArray();
+
+    }
+
+    switch (TimeDivision)
+    {
+        case TimeDivision.Hour:
+            Minutes = 60;
+            Multiplyer = 1;
+            break;
+        case TimeDivision.FifteenMinutes:
+            Minutes = 15;
+            Multiplyer = 4;
+            break;
+        case TimeDivision.ThirtyMinutes:
+            Minutes = 30;
+            Multiplyer = 2;
+            break;
+        case TimeDivision.TwoHours:
+            Minutes = 120;
+            Multiplyer = 0.5m;
+            break;
+        default:
+            Minutes = 60;
+            Multiplyer = 1;
+            break;
+    }
+
+}
+
+<div class=@($"{isHidden} weekly-calendar") style="@Style">
+
+    <TimeSideBar Minutes="Minutes"
+                 Multiplyer="Multiplyer">
+    </TimeSideBar>
+
+    @for (int i = 0; i < NumberOfDays; i++)
+    {
+        int d = Dates.GetNumOfDay(i);
+        DateTime day = FirstDateWeek.AddDays(i);
+        string dayName = dayNames[d];
+        string dayDate = day.ToString("dd.MM");
+
+        <div class="day-header-column" style="grid-column-start: @(i+2);">
+            <DayHeader HeaderText=""
+                       HeaderStyle="@HeaderStyle"
+                       DayDate="@dayDate"
+                       DayName="@dayName">
+            </DayHeader>
+        </div>
+    }
+
+    <div class="all-day-grid">
+        <div class="title" style="grid-row-start: 1; grid-column-start: 1; font-size:small">All day</div>
+
+            <AllDayTasks DayClick="DayClick"
+                         Draggable="Draggable"
+                         DragStart="DragStart"
+                         DropTask="DropTask"
+                         EmptyDayClick="EmptyDayClick"
+                         TaskClick="TaskClick"
+                         Tasks="TasksList"
+                         FirstDateWeek="FirstDateWeek">
+            </AllDayTasks>
+    </div>
+
+    @for (int i = 0; i < NumberOfDays; i++)
+    {
+        DateTime day = FirstDateWeek.AddDays(i);
+        int d = Dates.GetNumOfDay(i);
+        <div class="day-column" style="grid-column-start: @(i+2);">
+            <DayColumn Draggable="Draggable"
+                       DragStart="HandleDragStart"
+                       DropTask="HandleDayOnDrop"
+                       EmptyDayClick="EmptyDayClick"
+                       TaskClick="TaskClick"
+                       TasksList="TasksList"
+                       DayClick="DayClick"
+                       Minutes="Minutes"
+                       Multiplyer="Multiplyer"
+                       TimeDivision="TimeDivision"
+                       SaturdayColor="@SaturdayColor"
+                       SundayColor="@SundayColor"
+                       WeekDaysColor="@WeekDaysColor"
+                       Day="day"
+                       DayNumber="d">
+            </DayColumn>
+        </div>
+    }
+
+</div>
+

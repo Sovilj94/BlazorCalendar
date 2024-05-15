@@ -1,0 +1,69 @@
+﻿@using BlazorCalendar.Models
+
+@inject ITaskDraggedService TaskDraggedService
+
+<div class="hour day-cellule noselect"
+     ondragover="event.preventDefault();this.style.fontWeight = '600';"
+     ondragleave="this.style.fontWeight='100';"
+     @ondrop:preventDefault="true"
+     @ondrop="() => HandleDayOnDrop(Time)"
+     @onclick="e => ClickDayInternal(e, Time)"
+     style="@CSSbackground; @CSSGridPosition ">
+</div>
+
+@code {
+    [Parameter]
+    public string CSSGridPosition { get; set; }
+
+    [Parameter]
+    public string CSSbackground { get; set; }
+
+    [Parameter]
+    public DateTime Time { get; set; }
+
+    [Parameter]
+    public bool Draggable { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DropTask { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> EmptyDayClick { get; set; }
+
+    private Tasks TaskDragged => TaskDraggedService.TaskDragged;
+
+    private async Task HandleDayOnDrop(DateTime day)
+    {
+        if (!Draggable)
+            return;
+
+        if (TaskDragged is null)
+            return;
+
+        DragDropParameter dragDropParameter = new()
+            {
+                Day = day,
+                taskID = TaskDragged.ID
+            };
+
+        await DropTask.InvokeAsync(dragDropParameter);
+    }
+
+    private async Task ClickDayInternal(MouseEventArgs e, DateTime day)
+    {
+        if (!DayClick.HasDelegate)
+            return;
+
+        ClickEmptyDayParameter clickEmptyDayParameter = new()
+            {
+                Day = day,
+                X = e.ClientX,
+                Y = e.ClientY
+            };
+
+        await DayClick.InvokeAsync(clickEmptyDayParameter);
+    }
+}

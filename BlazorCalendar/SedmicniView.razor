@@ -1,0 +1,29 @@
+﻿@page "/sedmicniView"
+
+<h3>SedmicniView</h3>
+
+<div class="weekly-calendar" style="display:grid">
+
+        @for (int i = 0; i < BrojDana; i++)
+        {
+            <div class="day-column" style="grid-column-start:@(i+1)">
+                    
+                 @for(int j = 0; j < 24; j++)
+                 {
+                    <div class="hour-row" style="grid-row-start:@(j+1); border:1px solid #ccc">
+                        @(j)
+                    </div>
+                 }
+
+            </div>
+        }
+
+</div>
+
+
+
+
+@code {
+
+    public int BrojDana { get; set; } = 7;
+}

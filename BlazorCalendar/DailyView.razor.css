@@ -1,0 +1,74 @@
+﻿.daily-calendar {
+    display: grid;
+    width: 100%;
+    overflow: auto;
+    gap: 10px;
+}
+
+.day-header {
+    grid-area: 1 / 1 / span 1 / span 1;
+    background: #E6E6FA;
+    display:grid;
+}
+
+.hours {
+    border-bottom: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    display: grid;
+    justify-content: stretch;
+    overflow: auto; /* Added overflow for scrollable content */
+}
+
+.hour {
+    font-size: 0.8em;
+    padding-left: 0.5em;
+    border-right: 1px solid #ccc; /* Separate hour divs */
+    padding: 0.5rem;
+    text-align: right;
+    padding-right: 50px;
+}
+
+.hour:hover {
+    background:#ccc;
+}
+
+.hour:not(:hover){
+    background:initial;
+}
+
+.hour-task {
+    text-align: center;
+    font-size: 0.8em;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position:relative;
+    margin: 3px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: minmax(min-content, 50px) auto;
+    width: 100%;
+}
+
+.hour-task-container {
+    /*display: flex;*/
+}
+
+.hour.drag-over {
+    background: #ccc; /* Change to the desired background color */
+}
+
+@media only screen and (max-width: 587px) {
+    .hour,
+    .hour-task {
+        font-size: 0.6em;
+        padding-left: 0.3em;
+    }
+
+    .day-header {
+        line-height: 3vh; /* Adjusted line height */
+    }
+}
