@@ -1,17 +1,19 @@
 ﻿
+using System.Reflection.Metadata.Ecma335;
+
 namespace BlazorCalendar.Models.ViewModel
 {
     public class DayCalendarViewModel
     {
-        public decimal NumberOfTimeCells { get; set; }
+        public  List<Tasks> Tasks { get; set; }
 
-        public int column { get; set; } = 1;
+        public GridItemViewModel GridItem { get; set; }
 
-        List<GridItemViewModel> GridItem { get; set; }
+        public TimeCellViewModel TimeCell { get; set; } 
 
-        List<TimeCellViewModel> TimeCells { get; set; }
+        public TimeDivision TimeDivision { get; set; }
 
-        public decimal Multiplyer { get; set; }
+        public DateTime Day { get; set; }
 
         public string SaturdayColor { get; set; }
 

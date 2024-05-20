@@ -2,7 +2,7 @@
 @inherits CalendarBase
 
 <CascadingValue Value="DisplayedView" Name="SelectedView">
-    <CascadingValue Value="TimeDivision" Name="TimeDivision">
+    <CascadingValue Value="TimeDivisionEnum" Name="TimeDivisionEnum">
         <CascadingValue Value="FirstDate" Name="FirstDate">
             <CascadingValue Value="TasksList" Name="TasksList">
                 @ChildContent
@@ -22,9 +22,9 @@
     public DisplayedView DisplayedView { get; set; }
 
     [Parameter]
-    public TimeDivision TimeDivision { get; set; }
+    public TimeDivisionEnum TimeDivisionEnum { get; set; }
 
     [Parameter]
-    public Tasks[]? TasksList { get; set; }
+    public List<Tasks>? TasksList { get; set; }
 }
 

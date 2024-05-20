@@ -12,8 +12,8 @@ partial class WeekViewNew : CalendarBase
 
     public int DayNumber { get; set; } = 0;
 
-    [CascadingParameter(Name = "TimeDivision")]
-    public TimeDivision TimeDivision { get; set; }
+    [CascadingParameter(Name = "TimeDivisionEnum")]
+    public TimeDivisionEnum TimeDivisionEnum { get; set; }
 
     [CascadingParameter(Name = "SelectedView")]
     public DisplayedView DisplayedView { get; set; } = DisplayedView.Weekly;

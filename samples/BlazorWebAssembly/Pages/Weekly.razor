@@ -12,11 +12,11 @@
         <option value="@PriorityLabel.Code" selected>priority Code</option>
         <option value="@PriorityLabel.Caption">priority Caption</option>
     </select>
-    <select @bind="@TimeDivision" class="me-2">
-        <option value="@TimeDivision.TwoHours">Two Hours</option>
-        <option value="@TimeDivision.Hour">Hour </option>
-        <option value="@TimeDivision.ThirtyMinutes">Thirty Minutes</option>
-        <option value="@TimeDivision.FifteenMinutes">Fifteen Minutes</option>
+    <select @bind="@TimeDivisionEnum" class="me-2">
+        <option value="@TimeDivisionEnum.TwoHours">Two Hours</option>
+        <option value="@TimeDivisionEnum.Hour">Hour </option>
+        <option value="@TimeDivisionEnum.ThirtyMinutes">Thirty Minutes</option>
+        <option value="@TimeDivisionEnum.FifteenMinutes">Fifteen Minutes</option>
     </select>
     <div>
         <input type="checkbox" @bind="draggable" id="is-draggable" />
@@ -25,9 +25,9 @@
 </div>
 
 <CalendarContainer FirstDate="today"
-                   TasksList="TasksList.ToArray()"
+                   TasksList="TasksList.ToList()"
                    DisplayedView="DisplayedView.Weekly"
-                   TimeDivision="@TimeDivision">
+                   TimeDivision="@TimeDivisionEnum">
     <WeekView PriorityDisplay="@PriorityDisplay"
               OutsideCurrentMonthClick="OutsideCurrentMonthClick"
               TaskClick="TaskClick"
@@ -47,7 +47,7 @@
     private List<Tasks> TasksList;
     private string fakeConsole = "";
     private BlazorCalendar.PriorityLabel PriorityDisplay = PriorityLabel.Code;
-    private TimeDivision TimeDivision = TimeDivision.Hour;
+    private TimeDivisionEnum TimeDivisionEnum = TimeDivisionEnum.Hour;
     private bool draggable = true;
 
     protected override void OnInitialized()

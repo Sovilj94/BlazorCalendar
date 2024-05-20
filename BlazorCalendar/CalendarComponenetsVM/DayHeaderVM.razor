@@ -1,0 +1,30 @@
+﻿@using BlazorCalendar.Models.ViewModel
+
+<div class="day-header header-name noselect" style="@DayHeader.HeaderStyle; border:1px solid #ccc; width:170px"
+     ondragover="event.preventDefault();this.style.fontWeight = '600';"
+     ondragleave="this.style.fontWeight='100';"
+     @ondrop:preventDefault="true">
+
+    @DayHeader.DayName @DayHeader.DayDate
+
+</div>
+
+@code {
+
+    [Parameter]
+    public DayHeaderViewModel DayHeader { get; set; }
+
+    // public string[] dayNames = { "Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub" };
+
+    // [Parameter]
+    // public string DayName { get; set; }
+
+    // [Parameter]
+    // public string DayDate { get; set; }
+
+    // [Parameter]
+    // public string HeaderText { get; set; }
+
+    // [Parameter]
+    // public string HeaderStyle { get; set; }
+}

@@ -36,17 +36,17 @@
     }
 
     // Determine time division
-    switch (TimeDivision)
+    switch (TimeDivisionEnum)
     {
-        case TimeDivision.Hour:
+        case TimeDivisionEnum.Hour:
             minutes = 60;
             multiplyer = 1;
             break;
-        case TimeDivision.ThirtyMinutes:
+        case TimeDivisionEnum.ThirtyMinutes:
             minutes = 30;
             multiplyer = 2;
             break;
-        case TimeDivision.FifteenMinutes:
+        case TimeDivisionEnum.FifteenMinutes:
             minutes = 15;
             multiplyer = 4;
             break;

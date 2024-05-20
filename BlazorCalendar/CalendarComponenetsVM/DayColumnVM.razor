@@ -1,0 +1,125 @@
+﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.ViewModel
+@using BlazorCalendar.Services
+@using BlazorCalendar.Styles
+
+@inject TasksService TasksService
+
+<div class="dayGrid" style="">
+    @{
+
+        TasksForDay = TasksService.GetTaskPositionForDayGrid(DayCalendar.Day, DayCalendar.Tasks,DayCalendar.TimeDivision.Minutes);
+        if (TasksForDay is not null && TasksForDay.Count != 0)
+            MaxNumberOfColumnsInDay = TasksForDay.Max(x => x.ColumnStart);
+        else
+            MaxNumberOfColumnsInDay = 1;
+    }
+
+    @for (int dayTime = 0; dayTime < DayCalendar.TimeDivision.NumberOfCells; dayTime++)
+    {
+        DateTime time = DayCalendar.Day.AddMinutes(dayTime * DayCalendar.TimeDivision.Minutes);
+        int row = dayTime + 1;
+
+        DayCalendar.TimeCell = new TimeCellViewModel();
+        DayCalendar.TimeCell.CSSGridPosition = $"grid-row:{row}; grid-column:1 / span {MaxNumberOfColumnsInDay};";
+        DayCalendar.TimeCell.Time = time;
+        DayCalendar.TimeCell.CSSbackground = GetBackground(DayCalendar.Day);
+
+        <TimeCellVM DayClick="DayClick"
+                    EmptyDayClick="EmptyDayClick"
+                    Draggable="Draggable"
+                    DropTask="DropTask"
+                    TimeCell="DayCalendar.TimeCell">
+        </TimeCellVM>
+    }
+
+    @if (TasksForDay is not null)
+    {
+        for (var k = 0; k < TasksForDay.Count; k++)
+        {
+            Tasks t = TasksForDay[k];
+
+            if (t.DateStart.TimeOfDay != TimeSpan.Zero || t.DateEnd.TimeOfDay != TimeSpan.Zero)
+            {
+                if (t.RowEnd - t.RowStart != 0)
+                {
+                    DayCalendar.GridItem = new GridItemViewModel();
+                    DayCalendar.GridItem.Task = t;
+                    DayCalendar.GridItem.Day = DayCalendar.Day;
+                    DayCalendar.GridItem.TaskColor = Colors.GetHatching(t.FillStyle, t.Color);
+                    DayCalendar.GridItem.TaskColor = $"{DayCalendar.GridItem.TaskColor};color:{t.ForeColor}";
+
+                    DayCalendar.GridItem.ClassPin = string.IsNullOrWhiteSpace(t.Comment) ? null : " pin";
+                    DayCalendar.GridItem.ClassPointer = " cursor-pointer";
+
+                    string gridRow = $"grid-row: {t.RowStart} / span {t.RowEnd - t.RowStart};";
+                    string gridColumn = $"grid-column-start: {t.ColumnStart};";
+
+                    string CSSGridPoition = $"{gridRow} {gridColumn}";
+
+                    DayCalendar.GridItem.CSSGridPosition = CSSGridPoition;
+
+                    <GridItemVM GridItem="DayCalendar.GridItem"
+                                Draggable="Draggable"
+                                DragStart="DragStart"
+                                TaskClick="TaskClick">
+                    </GridItemVM>
+                }
+            }
+        }
+    }
+</div>
+
+
+@code {
+
+    public List<Tasks>? TasksForDay { get; set; }
+
+    [Parameter]
+    public DayCalendarViewModel DayCalendar { get; set; }
+
+    [Parameter]
+    public bool Draggable { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> EmptyDayClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickTaskParameter> TaskClick { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DragStart { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DropTask { get; set; }
+
+    [Parameter]
+    public int DayNumber { get; set; }
+
+    private async Task HandleDragStart(DragDropParameter dragDropParameter)
+    {
+        await DragStart.InvokeAsync(dragDropParameter);
+    }
+
+    private string GetBackground(DateTime day)
+    {
+        int d = (int)day.DayOfWeek;
+
+        if (d == 6)
+        {
+            return $"background:{DayCalendar.SaturdayColor}";
+        }
+        else if (d == 0)
+        {
+            return $"background:{DayCalendar.SundayColor}";
+        }
+
+        return $"background:{DayCalendar.WeekDaysColor}";
+    }
+
+    public int MaxNumberOfColumnsInDay { get; set; }
+
+}

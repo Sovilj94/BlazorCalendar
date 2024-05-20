@@ -30,7 +30,7 @@ public enum FillStyleEnum
     CrossDots = 4
 }
 
-public enum TimeDivision
+public enum TimeDivisionEnum
 {
     TwoHours = 0,
     Hour = 1,

@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Components.Web;
 
 partial class WeekView : CalendarBase
 {
-    [CascadingParameter(Name = "TimeDivision")]
-    public TimeDivision TimeDivision { get; set; }
+    [CascadingParameter(Name = "TimeDivisionEnum")]
+    public TimeDivisionEnum TimeDivisionEnum { get; set; }
 
     [CascadingParameter(Name = "SelectedView")]
     public DisplayedView DisplayedView { get; set; } = DisplayedView.Weekly;

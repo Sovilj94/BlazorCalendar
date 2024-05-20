@@ -1,0 +1,32 @@
+﻿@using BlazorCalendar.Models.ViewModel
+
+<div style="grid-column-start: 1;">
+
+    <div class="day-header header-name noselect" style="border:1px solid #ccc;"
+         ondragover="event.preventDefault();this.style.fontWeight = '600';"
+         ondragleave="this.style.fontWeight='100';"
+         @ondrop:preventDefault="true">
+        <span>@TimeSideBar.Title</span>
+    </div>
+
+</div>
+<div class="hour-grid" style="grid-column-start:1; grid-row-start:3">
+
+    @for (int dayTime = 0; dayTime < TimeSideBar!.TimeDivision.NumberOfCells; dayTime++)
+    {
+        TimeSideBar.Time = DateTime.Today.AddMinutes(dayTime * TimeSideBar.TimeDivision.Minutes);
+        TimeSideBar.Time.AddMinutes(dayTime * TimeSideBar.TimeDivision.Minutes);
+
+
+        <div class="hour noselect" style="text-align:center; height:50px">
+            @TimeSideBar.Time.ToString("HH:mm")
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public TimeSideBarViewModel TimeSideBar { get; set; } = new TimeSideBarViewModel();
+
+
+}

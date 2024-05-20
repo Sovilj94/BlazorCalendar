@@ -34,21 +34,21 @@
 
     }
 
-    switch (TimeDivision)
+    switch (TimeDivisionEnum)
     {
-        case TimeDivision.Hour:
+        case TimeDivisionEnum.Hour:
             Minutes = 60;
             Multiplyer = 1;
             break;
-        case TimeDivision.FifteenMinutes:
+        case TimeDivisionEnum.FifteenMinutes:
             Minutes = 15;
             Multiplyer = 4;
             break;
-        case TimeDivision.ThirtyMinutes:
+        case TimeDivisionEnum.ThirtyMinutes:
             Minutes = 30;
             Multiplyer = 2;
             break;
-        case TimeDivision.TwoHours:
+        case TimeDivisionEnum.TwoHours:
             Minutes = 120;
             Multiplyer = 0.5m;
             break;
@@ -110,7 +110,7 @@
                        DayClick="DayClick"
                        Minutes="Minutes"
                        Multiplyer="Multiplyer"
-                       TimeDivision="TimeDivision"
+                       TimeDivisionEnum="TimeDivisionEnum"
                        SaturdayColor="@SaturdayColor"
                        SundayColor="@SundayColor"
                        WeekDaysColor="@WeekDaysColor"
