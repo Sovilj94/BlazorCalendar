@@ -2,9 +2,9 @@
 
 using System.Globalization;
 
-internal sealed class Dates
+public sealed class Dates
 {
-    internal static int GetNumOfDay(int numOfDay)
+    public static int GetNumOfDay(int numOfDay)
     {
         // The order of the days of the week is different in each country
         // DayOfWeek : 

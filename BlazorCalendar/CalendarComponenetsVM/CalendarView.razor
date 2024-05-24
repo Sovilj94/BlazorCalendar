@@ -1,0 +1,151 @@
+﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.ViewModel
+@using BlazorCalendar.Models.ViewModel.Interfaces
+@using System.Globalization
+@using BlazorCalendar.Services
+
+@inherits CalendarBase
+@inject TasksService TasksService
+
+<CascadingValue Value="DisplayedView" Name="SelectedView">
+    <CascadingValue Value="TimeDivisionEnum" Name="TimeDivisionEnum">
+        <CascadingValue Value="FirstDate" Name="FirstDate">
+            <CascadingValue Value="TasksList" Name="TasksList">
+                <WeekViewVM Draggable="Draggable"
+                            OutsideCurrentMonthClick="OutsideCurrentMonthClick"
+                            TaskClick="TaskClick"
+                            DayClick="DayClick"
+                            DragStart="DragStart"
+                            DropTask="DropTask"
+                            HighlightToday="true"
+                            WeekCalendar="WeekCalendarViewModel" />
+            </CascadingValue>
+        </CascadingValue>
+    </CascadingValue>
+</CascadingValue>
+
+<br />
+<div class="console">@fakeConsole</div>
+
+@code {
+    private string fakeConsole = "";
+    public DateTime FirstDateWeek { get; set; }
+    public CultureInfo culture = CultureInfo.CurrentCulture;
+    public DayOfWeek FirstDayOfWeek { get; set; }
+    public string[] dayNames = { "Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub" };
+
+    protected override void OnInitialized()
+    {
+        PopulateViewModel();
+    }
+
+    protected override void OnParametersSet()
+    {
+        PopulateViewModel();
+
+        WeekCalendarViewModel.DayCalendar.ForEach(x => x.TimeDivision = new TimeDivision(TimeDivisionEnum));
+    }
+
+    public WeekCalendarViewModel WeekCalendarViewModel { get; set; } = new WeekCalendarViewModel();
+
+
+    [Parameter]
+    public DateTime FirstDate { get; set; }
+
+    [Parameter]
+    public DisplayedView DisplayedView { get; set; }
+
+    [Parameter]
+    public TimeDivisionEnum TimeDivisionEnum { get; set; }
+
+    [Parameter]
+    public List<Tasks>? TasksList { get; set; }
+
+    private void ChangeFirstDate(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return;
+        FirstDate = DateTime.Parse(value.ToString());
+    }
+
+    private void GoToday()
+    {
+        FirstDate = DateTime.Today;
+    }
+
+    private void ClicMonthNavigate(int daysToAdd)
+    {
+        FirstDate = FirstDate.AddDays(daysToAdd);
+    }
+
+    private void OutsideCurrentMonthClick(int MonthAdded)
+    {
+        FirstDate = FirstDate.AddMonths(MonthAdded);
+    }
+
+    private void TaskClick(ClickTaskParameter clickTaskParameter)
+    {
+        fakeConsole = "ID task(s) :" + string.Join(", ", clickTaskParameter.IDList);
+    }
+
+    private void DayClick(ClickEmptyDayParameter clickEmptyDayParameter)
+    {
+        fakeConsole = $"Empty day :{clickEmptyDayParameter.Day.ToShortDateString()}  {clickEmptyDayParameter.Day.ToShortTimeString()}";
+    }
+
+    private void DragStart(DragDropParameter dragDropParameter)
+    {
+        fakeConsole = $"DragStart event : {dragDropParameter.taskID}";
+    }
+
+    private void DropTask(DragDropParameter dragDropParameter)
+    {
+        fakeConsole = $"DropTask event :{dragDropParameter.Day.ToShortDateString()} {dragDropParameter.taskID}";
+
+        Tasks taskDropped = TasksList.FirstOrDefault(t => t.ID == dragDropParameter.taskID);
+
+        var TotalDay = (taskDropped.DateEnd - taskDropped.DateStart).TotalDays;
+        taskDropped.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
+        taskDropped.DateStart = dragDropParameter.Day;
+    }
+
+    private void PopulateViewModel()
+    {
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+
+        TasksList = TasksService.GetAllTasks();
+
+        FirstDayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
+        FirstDateWeek = FirstDate.AddDays(-(FirstDate.DayOfWeek - FirstDayOfWeek));
+
+        WeekCalendarViewModel.DayHeader = new List<DayHeaderViewModel>();
+        WeekCalendarViewModel.DayCalendar = new List<DayCalendarViewModel>();
+        WeekCalendarViewModel.AllDay = new AllDayViewModel();
+        WeekCalendarViewModel.TimeSideBar = new TimeSideBarViewModel();
+
+        @for (int i = 0; i < 7; i++)
+        {
+            int d = Dates.GetNumOfDay(i);
+            DateTime day = FirstDateWeek.AddDays(i);
+            DayHeaderViewModel DayHeader = new DayHeaderViewModel();
+            DayHeader.DayName = dayNames[d];
+            DayHeader.DayDate = day.ToString("dd.MM");
+
+            DayCalendarViewModel DayCalendar = new DayCalendarViewModel();
+            DayCalendar.SaturdayColor = SaturdayColor;
+            DayCalendar.SundayColor = SundayColor;
+            DayCalendar.WeekDaysColor = WeekDaysColor;
+            DayCalendar.TimeDivision = new TimeDivision(TimeDivisionEnum);
+            DayCalendar.Tasks = TasksList;
+            DayCalendar.Day = day;
+
+            WeekCalendarViewModel.DayHeader.Add(DayHeader);
+            WeekCalendarViewModel.DayCalendar.Add(DayCalendar);
+        }
+
+        WeekCalendarViewModel.AllDay.Tasks = TasksList;
+        WeekCalendarViewModel.AllDay.FirstDateWeek = FirstDateWeek;
+
+        WeekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
+    }
+}
+

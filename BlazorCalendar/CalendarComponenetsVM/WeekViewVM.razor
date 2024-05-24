@@ -6,119 +6,40 @@
 @using BlazorCalendar.CalendarComponents
 
 
-
 @inherits CalendarBase
 
-@{
-    //DateTime FirstDateWeek = new DateTime(FirstDate.Year, FirstDate.Month, FirstDate.Day).AddDays(-(Dates.GetNumOfDay((int)FirstDate.Date.DayOfWeek)));
-    //string[] dayNames = CultureInfo.GetCultureInfo("sr-RS").DateTimeFormat.AbbreviatedDayNames;
+<div class="weekly-calendar" style="@Style">
 
-    // Get the current culture
-    CultureInfo culture = CultureInfo.CurrentCulture;
-
-    // Calculate the start of the week based on the culture
-    DayOfWeek firstDayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
-    DateTime FirstDateWeek = FirstDate.AddDays(-(FirstDate.DayOfWeek - firstDayOfWeek));
-
-
-    string[] dayNames = { "Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub" };
-    string? isHidden = DisplayedView == DisplayedView.Weekly ? null : "hidden-element";
-    string? CSSbackground = null;
-    string? taskColor = null;
-    string? classPin = null;
-    string? classPointer = null;
-    string borderStyle = "";
-
-    // The sorting must be done each time we redraw in case the user moves the spots
-    if (TasksList is not null)
-    {
-        TasksList = TasksList.OrderBy(x => x.DateStart)
-                             .ThenByDescending(x => x.DateEnd).ToList();
-
-    }
-
-    // switch (TimeDivisionEnum)
-    // {
-    //     case TimeDivisionEnum.Hour:
-    //         Minutes = 60;
-    //         Multiplyer = 1;
-    //         break;
-    //     case TimeDivisionEnum.FifteenMinutes:
-    //         Minutes = 15;
-    //         Multiplyer = 4;
-    //         break;
-    //     case TimeDivisionEnum.ThirtyMinutes:
-    //         Minutes = 30;
-    //         Multiplyer = 2;
-    //         break;
-    //     case TimeDivisionEnum.TwoHours:
-    //         Minutes = 120;
-    //         Multiplyer = 0.5m;
-    //         break;
-    //     default:
-    //         Minutes = 60;
-    //         Multiplyer = 1;
-    //         break;
-    // }
-}
-
-<div class=@($"{isHidden} weekly-calendar") style="@Style">
-
-    <TimeSideBarVM 
-        TimeSideBar="WeekCalendar.TimeSideBar ">
+    <TimeSideBarVM TimeSideBar="WeekCalendar.TimeSideBar ">
     </TimeSideBarVM>
 
-    @for (int i = 0; i < NumberOfDays; i++)
+    @for (int i = 0; i < WeekCalendar.DayHeader.Count; i++)
     {
-        int d = Dates.GetNumOfDay(i);
-        DateTime day = FirstDateWeek.AddDays(i);
-        WeekCalendar.DayHeader = new DayHeaderViewModel();
-        WeekCalendar.DayHeader.DayName = dayNames[d];
-        WeekCalendar.DayHeader.DayDate = day.ToString("dd.MM");
-        WeekCalendar.DayHeader.HeaderStyle = HeaderStyle;
-
         <div class="day-header-column" style="grid-column-start: @(i+2);">
-            <DayHeaderVM DayHeader="WeekCalendar.DayHeader">
+            <DayHeaderVM DayHeader="WeekCalendar.DayHeader[i]">
             </DayHeaderVM>
         </div>
     }
 
-    <div class="all-day-grid">
-        <div class="title" style="grid-row-start: 1; grid-column-start: 1; font-size:small">All day</div>
+    <AllDayTasksVM DayClick="DayClick"
+                   Draggable="Draggable"
+                   DragStart="DragStart"
+                   DropTask="DropTask"
+                   EmptyDayClick="EmptyDayClick"
+                   TaskClick="TaskClick"
+                   AllDay="WeekCalendar.AllDay">
+    </AllDayTasksVM>
 
-        <AllDayTasksVM DayClick="DayClick"
-                     Draggable="Draggable"
-                     DragStart="DragStart"
-                     DropTask="DropTask"
-                     EmptyDayClick="EmptyDayClick"
-                     TaskClick="TaskClick"
-                     Tasks="TasksList"
-                     FirstDateWeek="FirstDateWeek">
-        </AllDayTasksVM>
-    </div>
-
-    @for (int i = 0; i < NumberOfDays; i++)
+    @for (int i = 0; i < WeekCalendar.DayCalendar.Count; i++)
     {
-        DateTime day = FirstDateWeek.AddDays(i);
-        int d = Dates.GetNumOfDay(i);
-
-        WeekCalendar.DayCalendar = new DayCalendarViewModel();
-        WeekCalendar.DayCalendar.SaturdayColor = SaturdayColor;
-        WeekCalendar.DayCalendar.SundayColor = SundayColor;
-        WeekCalendar.DayCalendar.WeekDaysColor = WeekDaysColor;
-        WeekCalendar.DayCalendar.TimeDivision = new TimeDivision(TimeDivisionEnum);
-        WeekCalendar.DayCalendar.Tasks = TasksList;
-        WeekCalendar.DayCalendar.Day = day;
-
         <div class="day-column" style="grid-column-start: @(i+2);">
-            <DayColumnVM
-                       DayCalendar="WeekCalendar.DayCalendar"
-                       Draggable="Draggable"
-                       DragStart="HandleDragStart"
-                       DropTask="HandleDayOnDrop"
-                       EmptyDayClick="EmptyDayClick"
-                       TaskClick="TaskClick"
-                       DayClick="DayClick">
+            <DayColumnVM DayCalendar="WeekCalendar.DayCalendar[i]"
+                         Draggable="Draggable"
+                         DragStart="HandleDragStart"
+                         DropTask="HandleDayOnDrop"
+                         EmptyDayClick="EmptyDayClick"
+                         TaskClick="TaskClick"
+                         DayClick="DayClick">
             </DayColumnVM>
         </div>
     }
@@ -127,46 +48,13 @@
 
 @code {
 
-    protected override void OnInitialized()
-    {
-        WeekCalendar.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
-        WeekCalendar.DayCalendar.TimeDivision = new TimeDivision(TimeDivisionEnum);
-    }
-
-    protected override void OnParametersSet()
-    {
-        WeekCalendar.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
-        WeekCalendar.DayCalendar.TimeDivision = new TimeDivision(TimeDivisionEnum);
-    }
-
-    public int Minutes { get; set; }
-    public decimal Multiplyer { get; set; }
     public int NumberOfDays { get; set; } = 7;
 
-    public int DayNumber { get; set; } = 0;
-
-    public WeekCalendarViewModel WeekCalendar { get; set; } =  new WeekCalendarViewModel();
-
-    [CascadingParameter(Name = "TimeDivisionEnum")]
-    public TimeDivisionEnum TimeDivisionEnum { get; set; }
+    [Parameter]
+    public WeekCalendarViewModel WeekCalendar { get; set; } = new WeekCalendarViewModel();
 
     [CascadingParameter(Name = "SelectedView")]
     public DisplayedView DisplayedView { get; set; } = DisplayedView.Weekly;
-
-    private DateTime _firstdate;
-    [CascadingParameter(Name = "FirstDate")]
-    public DateTime FirstDate
-    {
-        get
-        {
-            if (_firstdate == DateTime.MinValue) _firstdate = DateTime.Today;
-            return _firstdate.Date;
-        }
-        set
-        {
-            _firstdate = value;
-        }
-    }
 
     [CascadingParameter(Name = "TasksList")]
     public List<Tasks>? TasksList { get; set; }

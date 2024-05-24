@@ -3,6 +3,7 @@
 @using BlazorCalendar.CalendarComponenetsVM
 @using BlazorCalendar.Models
 @using System.Globalization
+@using BlazorCalendar.Models.ViewModel
 @using BlazorCalendar.Services
 
 @inject TasksService TasksService
@@ -28,18 +29,28 @@
     </div>
 </div>
 
+
+@* <CalendarContainer 
+    From="DateTime.Now" 
+    To="DateTime.AddDays(7)"
+    CurrentView="WeekView"
+    CalendarViewModel="_calendarViewModel"
+    />
+ *@
+
 <CalendarContainer FirstDate="today"
                    TasksList="TasksList.ToList()"
                    DisplayedView="DisplayedView.Weekly"
                    TimeDivisionEnum="@TimeDivisionEnum">
-    <WeekViewVM PriorityDisplay="@PriorityDisplay"
+    <WeekViewVM  PriorityDisplay="@PriorityDisplay"
                  OutsideCurrentMonthClick="OutsideCurrentMonthClick"
                  TaskClick="TaskClick"
                  DayClick="DayClick"
                  Draggable="@draggable"
                  DragStart="DragStart"
                  DropTask="DropTask"
-                 HighlightToday="true" />
+                 HighlightToday="true"
+                 WeekCalendar="WeekCalendarViewModel"/>
 </CalendarContainer>
 
 <br />
@@ -54,29 +65,66 @@
     private TimeDivisionEnum TimeDivisionEnum = TimeDivisionEnum.Hour;
     private bool draggable = true;
 
+    public DateTime FirstDateWeek { get; set; }
+    public CultureInfo culture = CultureInfo.CurrentCulture;
+    public DayOfWeek FirstDayOfWeek { get; set; }
+    public string[] dayNames = { "Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub" };
+
+    public string WeekDaysColor { get; set; } = "#FFF";
+
+    public string SaturdayColor { get; set; } = "#ECF4FD";
+
+    public string SundayColor { get; set; } = "#DBE7F8";
+
+    public WeekCalendarViewModel WeekCalendarViewModel { get; set; } = new WeekCalendarViewModel();
+
     protected override void OnInitialized()
     {
-        //CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("dz-DZ");
         CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
 
         TasksList = TasksService.GetAllTasks();
 
-        // TasksList = new()
-        // {
-        //      new Tasks { ID = 0, DateStart = today.AddHours(11), DateEnd = today.AddHours(16), Code = "HELLO", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
-        //      new Tasks { ID = 10, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "HELLO", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
-        //      new Tasks { ID = 11, DateStart = today.AddDays(5), DateEnd = today.AddDays(7), Code = "Woha", Color = "#FFD801", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
-        //      new Tasks { ID = 1, DateStart = today.AddDays(4).AddHours(8), DateEnd = today.AddDays(4).AddHours(11), Code = "😉 CP", Color = "#19C319", Caption = "Lorem ipsum dolor sit amet" } ,
-        //      new Tasks { ID = 2, DateStart = today.AddDays(-2).AddHours(8), DateEnd = today.AddDays(-2).AddHours(20), Code = "POD", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
-        //      new Tasks { ID = 3, DateStart = today.AddHours(5), DateEnd = today.AddHours(10), Code = "CALL", Color = "#eb3c37", ForeColor = "#222", Caption = "Lorem ipsum dolor sit amet", FillStyle=FillStyleEnum.CrossDots },
-        //      new Tasks { ID = 4, DateStart = today.AddDays(31), DateEnd = today.AddDays(31), Code = "MTG", Color = "#19C319", Caption = "MTG:France" },
-        //      new Tasks { ID = 5, DateStart = today.AddDays(40), DateEnd = today.AddDays(42), Code = "DEV", Color = "#FFD800", Comment="on Teams template", Caption = "Fusce quis purus eu ante" },
-        //      new Tasks { ID = 6, DateStart = today.AddDays(32), DateEnd = today.AddDays(33), Code = "MEET", Color = "#0d6efd" },
-        //      //new Tasks { ID = 7, DateStart = today.AddDays(32), DateEnd = today.AddDays(32), Code = "BLAZOR", Color = "#FFC3FF", Caption = "Blazor Dev" } ,
-        //      new Tasks { ID = 8, DateStart = today.AddDays(45).AddHours(8), DateEnd = today.AddDays(45).AddHours(9), Code = "MEETING", Color = "#2DD7D7", Comment="Julien's test" },
-        //      new Tasks { ID = 9, DateStart = today.AddDays(-8), DateEnd = today.AddDays(-7), Code = "MEET⭐", Color = "#0d6efd",Caption = "MTG:France" }
-        // };
+        FirstDayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
+        FirstDateWeek = today.AddDays(-(today.DayOfWeek - FirstDayOfWeek));
+
+        WeekCalendarViewModel.DayHeader = new List<DayHeaderViewModel>();
+        WeekCalendarViewModel.DayCalendar = new List<DayCalendarViewModel>();
+        WeekCalendarViewModel.AllDay = new AllDayViewModel();
+        WeekCalendarViewModel.TimeSideBar = new TimeSideBarViewModel();
+
+        @for (int i = 0; i < 7; i++)
+        {
+            int d = Dates.GetNumOfDay(i);
+            DateTime day = FirstDateWeek.AddDays(i);
+            DayHeaderViewModel DayHeader = new DayHeaderViewModel();
+            DayHeader.DayName = dayNames[d];
+            DayHeader.DayDate = day.ToString("dd.MM");
+
+            DayCalendarViewModel DayCalendar = new DayCalendarViewModel();
+            DayCalendar.SaturdayColor = SaturdayColor;
+            DayCalendar.SundayColor = SundayColor;
+            DayCalendar.WeekDaysColor = WeekDaysColor;
+            DayCalendar.TimeDivision = new TimeDivision(TimeDivisionEnum);
+            DayCalendar.Tasks = TasksList;
+            DayCalendar.Day = day;
+
+            WeekCalendarViewModel.DayHeader.Add(DayHeader);
+            WeekCalendarViewModel.DayCalendar.Add(DayCalendar);
+        }
+
+        WeekCalendarViewModel.AllDay.Tasks = TasksList;
+        WeekCalendarViewModel.AllDay.FirstDateWeek = FirstDateWeek;
+
+        WeekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
     }
+
+    protected override void OnParametersSet()
+    {
+        WeekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
+        WeekCalendarViewModel.DayCalendar.ForEach(x => x.TimeDivision = new TimeDivision(TimeDivisionEnum));
+    }
+
+
 
     private void ChangeFirstDate(string value)
     {

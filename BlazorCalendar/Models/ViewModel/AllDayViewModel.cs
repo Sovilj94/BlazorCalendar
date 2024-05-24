@@ -3,9 +3,11 @@ namespace BlazorCalendar.Models.ViewModel
 {
     public class AllDayViewModel
     {
-        public List<GridItemViewModel> GridItems { get; set; }
+        public GridItemViewModel GridItem { get; set; }
 
-        public List<TimeCellViewModel> TimeCells { get; set; }
+        public TimeCellViewModel TimeCell { get; set; }
+
+        public List<Tasks> Tasks{ get; set; }
 
         public int Column { get; set; }
 

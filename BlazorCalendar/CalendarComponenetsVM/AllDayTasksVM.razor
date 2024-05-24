@@ -4,45 +4,68 @@
 
 
 @{
-
-
-}
-@for (int column = 0; column < 7; column++)
-{
-    TimeCell = new TimeCellViewModel();
-    TimeCell.CSSGridPosition = $"grid-row:1; grid-column-start:{column + 2}; height:100px; border-right:1px solid #ccc";
-    <TimeCellVM TimeCell="TimeCell"></TimeCellVM>
-}
-@if (Tasks is not null)
-{
-    Tasks = GetAllDayTasksPositionOnWeekGrid(Day, Tasks);
-
-    for (var k = 0; k < Tasks.Count; k++)
+    var tasks = GetAllDayTasksPositionOnWeekGrid(AllDay.FirstDateWeek, AllDay.Tasks);
+    var span = 1;
+    if (tasks.Count > 0)
     {
-        Tasks t = Tasks[k];
+        span = tasks.Max(x => x.RowStart);
+    }
 
-        if (t.DateStart.TimeOfDay == TimeSpan.Zero && t.DateEnd.TimeOfDay == TimeSpan.Zero)
+}
+<div class="all-day-grid">
+    <div class="title" style="grid-row-start: 1; grid-column-start: 1; font-size:small">All day</div>
+    @for (int column = 0; column < 7; column++)
+    {
+        AllDay.TimeCell = new TimeCellViewModel();
+        AllDay.TimeCell.CSSGridPosition = $"grid-row:1 / span {span}; grid-column-start:{column + 2}; height:100px; border-right:1px solid #ccc";
+        <TimeCellVM DayClick="DayClick"
+                    EmptyDayClick="EmptyDayClick"
+                    Draggable="Draggable"
+                    DropTask="DropTask"
+                    TimeCell="AllDay.TimeCell">
+        </TimeCellVM>
+    }
+    @if (AllDay.Tasks is not null && AllDay.Tasks.Count > 0)
+    {
+        List<Tasks> allDayTasks = GetAllDayTasksPositionOnWeekGrid(AllDay.FirstDateWeek, AllDay.Tasks);
+
+        for (var k = 0; k < allDayTasks.Count; k++)
         {
-            TaskColor = Colors.GetHatching(t.FillStyle, t.Color);
-            TaskColor = $"{TaskColor};color:{t.ForeColor}";
+            Tasks t = allDayTasks[k];
 
-            TimeSpan duration = t.DateEnd - t.DateStart;
+            if (t.DateStart.TimeOfDay == TimeSpan.Zero && t.DateEnd.TimeOfDay == TimeSpan.Zero)
+            {
+                TaskColor = Colors.GetHatching(t.FillStyle, t.Color);
+                TaskColor = $"{TaskColor};color:{t.ForeColor}";
 
-            ClassPin = string.IsNullOrWhiteSpace(t.Comment) ? null : " pin";
-            ClassPointer = " cursor-pointer";
+                TimeSpan duration = t.DateEnd - t.DateStart;
 
-            int numberOfDays = (t.DateEnd - t.DateStart).Days;
-            string CSSGridPosition = $"grid-row-start:{t.RowStart} ;grid-column:{t.ColumnStart} / span {t.ColumnEnd - t.ColumnStart} ;";
+                ClassPin = string.IsNullOrWhiteSpace(t.Comment) ? null : " pin";
+                ClassPointer = " cursor-pointer";
 
-@*             <GridItemVM 
-                      Draggable="Draggable"
-                      DragStart="DragStart"
-                      TaskClick="TaskClick">
-            </GridItemVM> *@
+                AllDay.GridItem = new GridItemViewModel();
+                AllDay.GridItem.Task = t;
+                AllDay.GridItem.Day = AllDay.Day;
+                AllDay.GridItem.TaskColor = Colors.GetHatching(t.FillStyle, t.Color);
+                AllDay.GridItem.TaskColor = $"{AllDay.GridItem.TaskColor};color:{t.ForeColor}";
+
+                AllDay.GridItem.ClassPin = string.IsNullOrWhiteSpace(t.Comment) ? null : " pin";
+                AllDay.GridItem.ClassPointer = " cursor-pointer";
+
+                int numberOfDays = (t.DateEnd - t.DateStart).Days;
+                string CSSGridPosition = $"grid-row-start:{t.RowStart} ;grid-column:{t.ColumnStart} / span {t.ColumnEnd - t.ColumnStart} ;";
+
+                AllDay.GridItem.CSSGridPosition = CSSGridPosition;
+
+                <GridItemVM GridItem="AllDay.GridItem"
+                            Draggable="Draggable"
+                            DragStart="DragStart"
+                            TaskClick="TaskClick">
+                </GridItemVM>
+            }
         }
     }
-}
-
+</div>
 @code {
     public string TaskColor { get; set; }
 
@@ -51,19 +74,7 @@
     public string ClassPointer { get; set; }
 
     [Parameter]
-    public TimeCellViewModel TimeCell { get; set; }
-
-    [Parameter]
-    public List<Tasks> Tasks { get; set; }
-
-    [Parameter]
-    public int Column { get; set; }
-
-    [Parameter]
-    public DateTime Day { get; set; }
-
-    [Parameter]
-    public DateTime FirstDateWeek { get; set; }
+    public AllDayViewModel AllDay { get; set; }
 
     [Parameter]
     public bool Draggable { get; set; }
@@ -83,50 +94,81 @@
     [Parameter]
     public EventCallback<DragDropParameter> DropTask { get; set; }
 
-    public List<Tasks> GetAllDayTasksPositionOnWeekGrid(DateTime day, List<Tasks> tasks)
+    private async Task HandleDayOnDrop(DateTime day)
     {
-        var lastDateWeek = FirstDateWeek.AddDays(6);
-        List<Tasks> tasksForDate = tasks
-            .Where(task => task.DateStart.Date >= FirstDateWeek.Date && task.DateEnd.Day - task.DateStart.Day >= 1)
-            .OrderBy(x => x.DateStart)
-            .ThenBy(x => x.DateEnd)
-            .ToList();
+        
+    }
 
-        for (int i = 0; i < tasksForDate.Count; i++)
+    public List<Tasks> GetAllDayTasksPositionOnWeekGrid(DateTime firstDateOfWeek, List<Tasks> tasks)
+    {
+        HashSet<(int, DateTime)> dayAndNumbers = new HashSet<(int number, DateTime day)>();
+        int counter = 0;
+
+        for (int i = 2; i <= 8; i++)
         {
-            Tasks currentTask = tasksForDate[i];
+            dayAndNumbers.Add((i, firstDateOfWeek.AddDays(counter)));
+            counter++;
+        }
 
-            if (currentTask.DateStart.TimeOfDay == TimeSpan.Zero && currentTask.DateEnd.TimeOfDay == TimeSpan.Zero)
+        var lastDateOfWeek = firstDateOfWeek.AddDays(6);
+        List<Tasks> tasksForWeek = tasks
+        .Where(task =>
+        task.DateStart.TimeOfDay == TimeSpan.Zero && // Starts at 12 AM
+        task.DateEnd.TimeOfDay == TimeSpan.Zero && // Ends at 12 AM
+        (task.DateStart.Date <= lastDateOfWeek && task.DateEnd.Date >= firstDateOfWeek) // Falls within the week
+        )
+        .OrderBy(task => task.DateStart)
+        .ThenBy(task => task.DateEnd)
+        .ToList();
+
+        if (tasksForWeek.Count == 0)
+        {
+            return new List<Tasks>();
+        }
+
+        // Set the column start and end
+        foreach (var task in tasksForWeek)
+        {
+            if (task.DateStart.Date < firstDateOfWeek)
             {
-                TimeSpan duration = currentTask.DateEnd - currentTask.DateStart;
-
-                int numberOfDays = (currentTask.DateEnd - currentTask.DateStart).Days;
-
-                //get day number of the week
-                int startDayNumber = (int)currentTask.DateStart.DayOfWeek;
-                int endDayNumber = (int)currentTask.DateEnd.DayOfWeek;
-
-
-
-
-                if (numberOfDays >= 1)
-                {
-                    int row = 1;
-
-                    currentTask.ColumnStart = startDayNumber + 2;
-                    if (endDayNumber == 0)
-                    {
-                        currentTask.ColumnEnd = 9;
-                    }
-                    else{
-                        currentTask.ColumnEnd = endDayNumber + 2;
-                    }
-                    currentTask.RowStart = row;
-                    row++;
-                }
+                task.ColumnStart = dayAndNumbers.First(x => x.Item2.Date == firstDateOfWeek).Item1;
+            }
+            else
+            {
+                task.ColumnStart = dayAndNumbers.First(x => x.Item2.Date == task.DateStart.Date).Item1;
+            }
+            if (task.DateEnd.Date > lastDateOfWeek)
+            {
+                task.ColumnEnd = dayAndNumbers.First(x => x.Item2.Date == lastDateOfWeek).Item1 + 1;
+            }
+            else
+            {
+                task.ColumnEnd = dayAndNumbers.First(x => x.Item2.Date == task.DateEnd.Date).Item1 + 1;
             }
         }
 
-        return tasksForDate;
+        // Set the row start
+        if (tasksForWeek.Count > 1)
+        {
+            for (int i = 1; i < tasksForWeek.Count; i++)
+            {
+                tasksForWeek[0].RowStart = 1;
+
+                if (tasksForWeek[i].ColumnStart < tasksForWeek[0].ColumnEnd)
+                {
+                    tasksForWeek[i].RowStart = tasksForWeek[i - 1].RowStart + 1;
+                }
+                else
+                {
+                    tasksForWeek[i].RowStart = 1;
+                }
+            }
+        }
+        else
+        {
+            tasksForWeek[0].RowStart = 1;
+        }
+
+        return tasksForWeek;
     }
 }

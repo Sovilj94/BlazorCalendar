@@ -6,12 +6,12 @@ namespace BlazorCalendar.Models.ViewModel
 {
     public class WeekCalendarViewModel : ICalendarView
     {
-        public DayHeaderViewModel DayHeader { get; set; }
+        public List<DayHeaderViewModel> DayHeader { get; set; }
 
-        public List<AllDayViewModel> AllDay { get; set; }
+        public AllDayViewModel AllDay { get; set; }
 
-        public DayCalendarViewModel DayCalendar { get; set; } = new DayCalendarViewModel();
+        public List<DayCalendarViewModel> DayCalendar { get; set; }
 
-        public TimeSideBarViewModel TimeSideBar { get; set; } = new TimeSideBarViewModel();
+        public TimeSideBarViewModel TimeSideBar { get; set; }
     }
 }

@@ -29,7 +29,7 @@ namespace BlazorCalendar.Models
                     break;
                 case TimeDivisionEnum.TwoHours:
                     Minutes = 120;
-                    NumberOfCells = 12; // Adjust if you need another multiplier value
+                    NumberOfCells = 12;
                     break;
                 default:
                     Minutes = 60;

@@ -26,7 +26,7 @@ public abstract class CalendarBase : ComponentBase
     /// Allows the user to move the tasks
     /// </summary>
     [Parameter]
-    public bool Draggable { get; set; } = false;
+    public bool Draggable { get; set; } = true;
 
     /// <summary>
     /// Allows the user to change the background color of empty days
