@@ -25,6 +25,7 @@
                    Draggable="Draggable"
                    DragStart="DragStart"
                    DropTask="DropTask"
+                   DropTaskAllDay="DropTaskAllDay"
                    EmptyDayClick="EmptyDayClick"
                    TaskClick="TaskClick"
                    AllDay="WeekCalendar.AllDay">
@@ -35,8 +36,8 @@
         <div class="day-column" style="grid-column-start: @(i+2);">
             <DayColumnVM DayCalendar="WeekCalendar.DayCalendar[i]"
                          Draggable="Draggable"
-                         DragStart="HandleDragStart"
-                         DropTask="HandleDayOnDrop"
+                         DragStart="DragStart"
+                         DropTask="DropTask"
                          EmptyDayClick="EmptyDayClick"
                          TaskClick="TaskClick"
                          DayClick="DayClick">
@@ -48,19 +49,11 @@
 
 @code {
 
-    public int NumberOfDays { get; set; } = 7;
+    [Parameter]
+    public WeekCalendarViewModel WeekCalendar { get; set; }
 
     [Parameter]
-    public WeekCalendarViewModel WeekCalendar { get; set; } = new WeekCalendarViewModel();
-
-    [CascadingParameter(Name = "SelectedView")]
-    public DisplayedView DisplayedView { get; set; } = DisplayedView.Weekly;
-
-    [CascadingParameter(Name = "TasksList")]
-    public List<Tasks>? TasksList { get; set; }
-
-    [Parameter]
-    public PriorityLabel PriorityDisplay { get; set; } = PriorityLabel.Code;
+    public TimeDivisionEnum TimeDivisionEnum { get; set; }
 
     [Parameter]
     public bool HighlightToday { get; set; } = false;
@@ -83,42 +76,6 @@
     [Parameter]
     public EventCallback<DragDropParameter> DropTask { get; set; }
 
-    private Tasks? TaskDragged;
-    private async Task HandleDragStart(DragDropParameter dragDropParameter)
-    {
-        TaskDragged = new Tasks()
-            {
-                ID = dragDropParameter.taskID
-            };
-
-        await DragStart.InvokeAsync(dragDropParameter);
-    }
-
-    private async Task HandleDayOnDrop(DragDropParameter dragDropParameter)
-    {
-        if (!Draggable)
-            return;
-
-        if (TaskDragged is null)
-            return;
-
-        await DropTask.InvokeAsync(dragDropParameter);
-
-        TaskDragged = null;
-    }
-    private async Task ClickDayInternal(ClickEmptyDayParameter clickEmptyDayParameter)
-    {
-        if (!DayClick.HasDelegate)
-            return;
-
-        await DayClick.InvokeAsync(clickEmptyDayParameter);
-    }
-
-    private async Task ClickTaskInternal(ClickTaskParameter clickTaskParameter)
-    {
-        if (!TaskClick.HasDelegate)
-            return;
-
-        await TaskClick.InvokeAsync(clickTaskParameter);
-    }
+    [Parameter]
+    public EventCallback<DragDropParameter> DropTaskAllDay { get;set; }
 }

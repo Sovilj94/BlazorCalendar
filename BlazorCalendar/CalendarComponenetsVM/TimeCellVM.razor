@@ -23,6 +23,9 @@
     public EventCallback<DragDropParameter> DropTask { get; set; }
 
     [Parameter]
+    public EventCallback<DragDropParameter> DropTaskAllDay { get; set; }
+
+    [Parameter]
     public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
 
     [Parameter]
@@ -44,7 +47,10 @@
                 taskID = TaskDragged.ID
             };
 
-        await DropTask.InvokeAsync(dragDropParameter);
+        if (TimeCell.IsAllDayTimesCell)
+            await DropTaskAllDay.InvokeAsync(dragDropParameter);
+        else
+            await DropTask.InvokeAsync(dragDropParameter);
     }
 
     private async Task ClickDayInternal(MouseEventArgs e, DateTime day)

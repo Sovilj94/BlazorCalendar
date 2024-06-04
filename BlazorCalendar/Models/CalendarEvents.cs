@@ -19,4 +19,5 @@ public class DragDropParameter
 {
     public DateTime Day { get; set; }
     public int taskID { get; set; }
+    public DateTime DayFrom { get; set; }
 }

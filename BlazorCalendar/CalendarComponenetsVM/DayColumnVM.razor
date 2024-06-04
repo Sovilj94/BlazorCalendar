@@ -5,15 +5,7 @@
 
 @inject TasksService TasksService
 
-<div class="dayGrid" style="">
-    @{
-
-        TasksForDay = TasksService.GetTaskPositionForDayGrid(DayCalendar.Day, DayCalendar.Tasks,DayCalendar.TimeDivision.Minutes);
-        if (TasksForDay is not null && TasksForDay.Count != 0)
-            MaxNumberOfColumnsInDay = TasksForDay.Max(x => x.ColumnStart);
-        else
-            MaxNumberOfColumnsInDay = 1;
-    }
+<div class="dayGrid">
 
     @for (int dayTime = 0; dayTime < DayCalendar.TimeDivision.NumberOfCells; dayTime++)
     {
@@ -21,7 +13,7 @@
         int row = dayTime + 1;
 
         DayCalendar.TimeCell = new TimeCellViewModel();
-        DayCalendar.TimeCell.CSSGridPosition = $"grid-row:{row}; grid-column:1 / span {MaxNumberOfColumnsInDay};";
+        DayCalendar.TimeCell.CSSGridPosition = $"grid-row:{row}; grid-column:1 / span {DayCalendar.MaxNumberOfColumns};";
         DayCalendar.TimeCell.Time = time;
         DayCalendar.TimeCell.CSSbackground = GetBackground(DayCalendar.Day);
 
@@ -33,13 +25,13 @@
         </TimeCellVM>
     }
 
-    @if (TasksForDay is not null)
+    @if (DayCalendar.DayTasks is not null && DayCalendar.DayTasks.Count != 0)
     {
-        for (var k = 0; k < TasksForDay.Count; k++)
+        for (var k = 0; k < DayCalendar.DayTasks.Count; k++)
         {
-            Tasks t = TasksForDay[k];
+            Tasks t = DayCalendar.DayTasks[k];
 
-            if (t.DateStart.TimeOfDay != TimeSpan.Zero || t.DateEnd.TimeOfDay != TimeSpan.Zero)
+            if (t.DateStart.Date == DayCalendar.Day.Date)
             {
                 if (t.RowEnd - t.RowStart != 0)
                 {
@@ -66,6 +58,7 @@
                     </GridItemVM>
                 }
             }
+
         }
     }
 </div>
@@ -73,7 +66,7 @@
 
 @code {
 
-    public List<Tasks>? TasksForDay { get; set; }
+    public int MaxNumberOfColumnsInDay { get; set; }
 
     [Parameter]
     public DayCalendarViewModel DayCalendar { get; set; }
@@ -96,13 +89,6 @@
     [Parameter]
     public EventCallback<DragDropParameter> DropTask { get; set; }
 
-    [Parameter]
-    public int DayNumber { get; set; }
-
-    private async Task HandleDragStart(DragDropParameter dragDropParameter)
-    {
-        await DragStart.InvokeAsync(dragDropParameter);
-    }
 
     private string GetBackground(DateTime day)
     {
@@ -119,7 +105,4 @@
 
         return $"background:{DayCalendar.WeekDaysColor}";
     }
-
-    public int MaxNumberOfColumnsInDay { get; set; }
-
 }

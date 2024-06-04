@@ -7,79 +7,114 @@
 @inherits CalendarBase
 @inject TasksService TasksService
 
-<CascadingValue Value="DisplayedView" Name="SelectedView">
-    <CascadingValue Value="TimeDivisionEnum" Name="TimeDivisionEnum">
-        <CascadingValue Value="FirstDate" Name="FirstDate">
-            <CascadingValue Value="TasksList" Name="TasksList">
-                <WeekViewVM Draggable="Draggable"
-                            OutsideCurrentMonthClick="OutsideCurrentMonthClick"
-                            TaskClick="TaskClick"
-                            DayClick="DayClick"
-                            DragStart="DragStart"
-                            DropTask="DropTask"
-                            HighlightToday="true"
-                            WeekCalendar="WeekCalendarViewModel" />
-            </CascadingValue>
-        </CascadingValue>
-    </CascadingValue>
-</CascadingValue>
+<div class="d-flex flex-row mb-2">
+    <button type="button" @onclick="GoToday" class="btn">📅 Go Today</button>
+    <button type="button" @onclick="@(m => ClicMonthNavigate(-7))" class="btn">🔼</button>
+    <button type="button" @onclick="@(m => ClicMonthNavigate(7))" class="btn me-2">🔽</button>
+    <input type="date" class="me-2" value="@(FirstDate.ToString("yyyy-MM-dd"))" @onchange="@(e => ChangeFirstDate(e.Value.ToString()))" />
 
+    <select @bind="@TimeDivisionEnum" class="me-2">
+        <option value="@TimeDivisionEnum.TwoHours">Two Hours</option>
+        <option value="@TimeDivisionEnum.Hour">Hour </option>
+        <option value="@TimeDivisionEnum.ThirtyMinutes">Thirty Minutes</option>
+        <option value="@TimeDivisionEnum.FifteenMinutes">Fifteen Minutes</option>
+    </select>
+    <div>
+        <input type="checkbox" @bind="draggable" id="is-draggable" />
+        <label for="is-draggable">Draggable</label>
+    </div>
+
+    <div>
+        <select @bind="SelectedViewType" class="me-2">
+            <option value="@DisplayedView.Annual">Annual View</option>
+            <option value="@DisplayedView.Monthly">Monthly View</option>
+            <option value="@DisplayedView.Weekly">Weekly View</option>
+            <option value="@DisplayedView.Daily">Daily View</option>
+        </select>
+    </div>
+</div>
+
+@if (SelectedViewType == DisplayedView.Weekly)
+{
+    <WeekViewVM Draggable="Draggable"
+                OutsideCurrentMonthClick="OutsideCurrentMonthClick"
+                TaskClick="TaskClick"
+                DayClick="DayClick"
+                DragStart="DragStart"
+                DropTask="DropTask"
+                DropTaskAllDay="DropTaskAllDay"
+                HighlightToday="true"
+                TimeDivisionEnum="TimeDivisionEnum"
+                WeekCalendar="WeekCalendarViewModel" />
+}
+else if (SelectedViewType == DisplayedView.Daily)
+{
+    <div>Daily View</div>
+}
 <br />
 <div class="console">@fakeConsole</div>
 
 @code {
     private string fakeConsole = "";
     public DateTime FirstDateWeek { get; set; }
-    public CultureInfo culture = CultureInfo.CurrentCulture;
+    public DateTime FirstDate { get; set; }
     public DayOfWeek FirstDayOfWeek { get; set; }
-    public string[] dayNames = { "Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub" };
 
-    protected override void OnInitialized()
-    {
-        PopulateViewModel();
-    }
+    public TimeDivisionEnum TimeDivisionEnum { get; set; } = TimeDivisionEnum.Hour;
+    private DisplayedView SelectedViewType = DisplayedView.Weekly;
 
-    protected override void OnParametersSet()
-    {
-        PopulateViewModel();
+    public CultureInfo culture = CultureInfo.CurrentCulture;
 
-        WeekCalendarViewModel.DayCalendar.ForEach(x => x.TimeDivision = new TimeDivision(TimeDivisionEnum));
-    }
+
+    public ICalendarView CalendarViewModel { get; set; } = new WeekCalendarViewModel();
 
     public WeekCalendarViewModel WeekCalendarViewModel { get; set; } = new WeekCalendarViewModel();
 
 
-    [Parameter]
-    public DateTime FirstDate { get; set; }
+    public string[] dayNames = { "Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub" };
 
-    [Parameter]
-    public DisplayedView DisplayedView { get; set; }
 
-    [Parameter]
-    public TimeDivisionEnum TimeDivisionEnum { get; set; }
+    private bool draggable = true;
 
-    [Parameter]
-    public List<Tasks>? TasksList { get; set; }
+    protected override void OnInitialized()
+    {
+        FirstDate = DateTime.Today;
+        CalendarViewModel = PopulateViewModel();
+        WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
+
+    }
+
+    protected override void OnParametersSet()
+    {
+        CalendarViewModel = PopulateViewModel();
+        WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
+        WeekCalendarViewModel.DayCalendar.ForEach(x => x.TimeDivision = new TimeDivision(TimeDivisionEnum));
+        WeekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
+    }
 
     private void ChangeFirstDate(string value)
     {
         if (string.IsNullOrEmpty(value)) return;
         FirstDate = DateTime.Parse(value.ToString());
+        RefreshCalendarModel();
     }
 
     private void GoToday()
     {
         FirstDate = DateTime.Today;
+        RefreshCalendarModel();
     }
 
     private void ClicMonthNavigate(int daysToAdd)
     {
         FirstDate = FirstDate.AddDays(daysToAdd);
+        RefreshCalendarModel();
     }
 
     private void OutsideCurrentMonthClick(int MonthAdded)
     {
         FirstDate = FirstDate.AddMonths(MonthAdded);
+        RefreshCalendarModel();
     }
 
     private void TaskClick(ClickTaskParameter clickTaskParameter)
@@ -101,26 +136,58 @@
     {
         fakeConsole = $"DropTask event :{dragDropParameter.Day.ToShortDateString()} {dragDropParameter.taskID}";
 
-        Tasks taskDropped = TasksList.FirstOrDefault(t => t.ID == dragDropParameter.taskID);
+        var droppedTask = WeekCalendarViewModel.Tasks.FirstOrDefault(t => t.ID == dragDropParameter.taskID);
 
-        var TotalDay = (taskDropped.DateEnd - taskDropped.DateStart).TotalDays;
-        taskDropped.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
-        taskDropped.DateStart = dragDropParameter.Day;
+        var DayCalendarDropped = WeekCalendarViewModel.DayCalendar.FirstOrDefault(x => x.Day.Date == dragDropParameter.Day.Date);
+        var DayCalendarDragged = WeekCalendarViewModel.DayCalendar.FirstOrDefault(x => x.Day.Date == droppedTask.DateStart.Date);
+
+        DayCalendarDropped.DayTasks.Add(droppedTask);
+        DayCalendarDragged.DayTasks.Remove(droppedTask);
+
+        var TotalDay = (droppedTask.DateEnd - droppedTask.DateStart).TotalDays;
+
+        droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
+        droppedTask.DateStart = dragDropParameter.Day;
+
+        WeekCalendarViewModel.DayCalendar.ForEach(x => x.DayTasks = TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks));
+
+        if (DayCalendarDropped.DayTasks.Count != 0)
+            DayCalendarDropped.MaxNumberOfColumns = DayCalendarDropped.DayTasks.Max(x => x.ColumnStart);
+
+        if (DayCalendarDragged.DayTasks.Count != 0)
+            DayCalendarDragged.MaxNumberOfColumns = DayCalendarDragged.DayTasks.Max(x => x.ColumnStart);
     }
 
-    private void PopulateViewModel()
+    private void DropTaskAllDay(DragDropParameter dragDropParameter)
     {
-        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+        var droppedTask = WeekCalendarViewModel.AllDay.Tasks.FirstOrDefault(x => x.ID == dragDropParameter.taskID);
 
-        TasksList = TasksService.GetAllTasks();
+        if (droppedTask != null)
+        {
+            var TotalDay = (droppedTask.DateEnd - droppedTask.DateStart).TotalDays;
+
+            droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
+            droppedTask.DateStart = dragDropParameter.Day;
+
+            WeekCalendarViewModel.AllDay.Tasks = TasksService.GetAllDayTaskPositionForDayGrid(WeekCalendarViewModel.AllDay.Tasks, WeekCalendarViewModel.AllDay.FirstDateWeek);
+        }
+
+    }
+
+    private ICalendarView PopulateViewModel()
+    {
+        WeekCalendarViewModel weekCalendarViewModel = new WeekCalendarViewModel();
 
         FirstDayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
         FirstDateWeek = FirstDate.AddDays(-(FirstDate.DayOfWeek - FirstDayOfWeek));
+        var lastDateOfWeek = FirstDateWeek.AddDays(6);
+        weekCalendarViewModel.DayHeader = new List<DayHeaderViewModel>();
+        weekCalendarViewModel.DayCalendar = new List<DayCalendarViewModel>();
+        weekCalendarViewModel.AllDay = new AllDayViewModel();
+        weekCalendarViewModel.TimeSideBar = new TimeSideBarViewModel();
+        weekCalendarViewModel.Tasks = new List<Tasks>();
 
-        WeekCalendarViewModel.DayHeader = new List<DayHeaderViewModel>();
-        WeekCalendarViewModel.DayCalendar = new List<DayCalendarViewModel>();
-        WeekCalendarViewModel.AllDay = new AllDayViewModel();
-        WeekCalendarViewModel.TimeSideBar = new TimeSideBarViewModel();
+        weekCalendarViewModel.Tasks = TasksService.GetTasksForWeekViewModel(FirstDateWeek, lastDateOfWeek, TasksService.GetAllTasks());
 
         @for (int i = 0; i < 7; i++)
         {
@@ -135,17 +202,33 @@
             DayCalendar.SundayColor = SundayColor;
             DayCalendar.WeekDaysColor = WeekDaysColor;
             DayCalendar.TimeDivision = new TimeDivision(TimeDivisionEnum);
-            DayCalendar.Tasks = TasksList;
             DayCalendar.Day = day;
+            DayCalendar.DayTasks = TasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks);
 
-            WeekCalendarViewModel.DayHeader.Add(DayHeader);
-            WeekCalendarViewModel.DayCalendar.Add(DayCalendar);
+            if (DayCalendar.DayTasks != null && DayCalendar.DayTasks.Count != 0)
+                DayCalendar.MaxNumberOfColumns = DayCalendar.DayTasks.Max(x => x.ColumnStart);
+            else
+                DayCalendar.MaxNumberOfColumns = 1;
+
+            weekCalendarViewModel.DayHeader.Add(DayHeader);
+            weekCalendarViewModel.DayCalendar.Add(DayCalendar);
         }
 
-        WeekCalendarViewModel.AllDay.Tasks = TasksList;
-        WeekCalendarViewModel.AllDay.FirstDateWeek = FirstDateWeek;
+        weekCalendarViewModel.AllDay.Tasks = TasksService.GetAllDayTaskPositionForDayGrid(TasksService.GetAllTasks(), FirstDateWeek);
+        weekCalendarViewModel.AllDay.FirstDateWeek = FirstDateWeek;
 
+        weekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
+
+        return weekCalendarViewModel;
+    }
+
+    private void RefreshCalendarModel()
+    {
+        CalendarViewModel = PopulateViewModel();
+        WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
+        WeekCalendarViewModel.DayCalendar.ForEach(x => x.TimeDivision = new TimeDivision(TimeDivisionEnum));
         WeekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
+        StateHasChanged();
     }
 }
 

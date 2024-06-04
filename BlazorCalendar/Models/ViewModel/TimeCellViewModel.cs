@@ -6,5 +6,6 @@ namespace BlazorCalendar.Models.ViewModel
         public string CSSGridPosition { get; set; }
         public string CSSbackground { get; set; }
         public DateTime Time { get; set; }
+        public bool IsAllDayTimesCell { get; set; } = false;
     }
 }
