@@ -1,56 +1,62 @@
 ﻿@using System.Globalization
 @using BlazorCalendar.Models
 @using BlazorCalendar.Models.ViewModel
+@using BlazorCalendar.Models.ViewModel.Interfaces
 @using BlazorCalendar.Services
 @using BlazorCalendar.Styles
-@using BlazorCalendar.CalendarComponents
 
 
 @inherits CalendarBase
 
 <div class="weekly-calendar" style="@Style">
 
-    <TimeSideBarVM TimeSideBar="WeekCalendar.TimeSideBar ">
-    </TimeSideBarVM>
+    <TimeSideBar TimeSideBarViewModel="WeekCalendarViewModel.TimeSideBar ">
+    </TimeSideBar>
 
-    @for (int i = 0; i < WeekCalendar.DayHeader.Count; i++)
+    @for (int i = 0; i < WeekCalendarViewModel.DayHeader.Count; i++)
     {
         <div class="day-header-column" style="grid-column-start: @(i+2);">
-            <DayHeaderVM DayHeader="WeekCalendar.DayHeader[i]">
+            <DayHeaderVM DayHeader="WeekCalendarViewModel.DayHeader[i]">
             </DayHeaderVM>
         </div>
     }
 
-    <AllDayTasksVM DayClick="DayClick"
+    <AllDayTasks DayClick="DayClick"
                    Draggable="Draggable"
                    DragStart="DragStart"
                    DropTask="DropTask"
                    DropTaskAllDay="DropTaskAllDay"
                    EmptyDayClick="EmptyDayClick"
                    TaskClick="TaskClick"
-                   AllDay="WeekCalendar.AllDay">
-    </AllDayTasksVM>
+                 AllDay="WeekCalendarViewModel.AllDay">
+    </AllDayTasks>
 
-    @for (int i = 0; i < WeekCalendar.DayCalendar.Count; i++)
+    @for (int i = 0; i < WeekCalendarViewModel.DayCalendar.Count; i++)
     {
         <div class="day-column" style="grid-column-start: @(i+2);">
-            <DayColumnVM DayCalendar="WeekCalendar.DayCalendar[i]"
+            <DayCalendar DayCalendarViewModel="WeekCalendarViewModel.DayCalendar[i]"
                          Draggable="Draggable"
                          DragStart="DragStart"
                          DropTask="DropTask"
                          EmptyDayClick="EmptyDayClick"
                          TaskClick="TaskClick"
                          DayClick="DayClick">
-            </DayColumnVM>
+            </DayCalendar>
         </div>
     }
 
 </div>
 
 @code {
+    protected override void OnInitialized()
+    {
+        WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
+    }
+
+    private WeekCalendarViewModel WeekCalendarViewModel { get; set; }
 
     [Parameter]
-    public WeekCalendarViewModel WeekCalendar { get; set; }
+    public ICalendarView CalendarViewModel { get; set; }
 
     [Parameter]
     public TimeDivisionEnum TimeDivisionEnum { get; set; }
@@ -78,4 +84,6 @@
 
     [Parameter]
     public EventCallback<DragDropParameter> DropTaskAllDay { get;set; }
+
+
 }

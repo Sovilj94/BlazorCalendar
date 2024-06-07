@@ -1,33 +1,19 @@
 ﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.ViewModel
 
 @inject ITaskDraggedService TaskDraggedService
 
-<div class="@($"hour-task {ClassPin}{ClassPointer} border-start border-top border-bottom")"
-     style="@CSSGridPosition @TaskColor"
+<div class="@($"hour-task {GridItemViewModel.ClassPin}{GridItemViewModel.ClassPointer} border-start border-top border-bottom")"
+     style="@GridItemViewModel.CSSGridPosition @GridItemViewModel.TaskColor"
      draggable="@Draggable.ToString()"
-     @ondragstart="(e) => HandleDragStart(Task.ID)"
-     @onclick="e => ClickTaskInternal(e, Task.ID, Day)">
-    @Task.Code
+     @ondragstart="(e) => HandleDragStart(GridItemViewModel.Task.ID)"
+     @onclick="e => ClickTaskInternal(e, GridItemViewModel.Task.ID, GridItemViewModel.Day)">
+    @GridItemViewModel.Task.Code
 </div>
 
 @code {
     [Parameter]
-    public DateTime Day { get; set; }
-
-    [Parameter]
-    public Tasks Task { get; set; }
-
-    [Parameter]
-    public string CSSGridPosition { get; set; }
-
-    [Parameter]
-    public string TaskColor { get; set; }
-
-    [Parameter]
-    public string ClassPin { get; set; }
-
-    [Parameter]
-    public string ClassPointer { get; set; }
+    public GridItemViewModel GridItemViewModel { get; set; }
 
     [Parameter]
     public bool Draggable { get; set; }

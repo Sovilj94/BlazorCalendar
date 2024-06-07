@@ -7,14 +7,14 @@
      ondragover="event.preventDefault();this.style.fontWeight = '600';"
      ondragleave="this.style.fontWeight='100';"
      @ondrop:preventDefault="true"
-     @ondrop="() => HandleDayOnDrop(TimeCell.Time)"
-     @onclick="e => ClickDayInternal(e, TimeCell.Time)"
-     style="@TimeCell.CSSbackground; @TimeCell.CSSGridPosition ">
+     @ondrop="() => HandleDayOnDrop(TimeCellViewModel.Time)"
+     @onclick="e => ClickDayInternal(e, TimeCellViewModel.Time)"
+     style="@TimeCellViewModel.CSSbackground; @TimeCellViewModel.CSSGridPosition ">
 </div>
 
 @code {
     [Parameter]
-    public TimeCellViewModel TimeCell { get; set; }
+    public TimeCellViewModel TimeCellViewModel { get; set; }
 
     [Parameter]
     public bool Draggable { get; set; }
@@ -47,7 +47,7 @@
                 taskID = TaskDragged.ID
             };
 
-        if (TimeCell.IsAllDayTimesCell)
+        if (TimeCellViewModel.IsAllDayTimesCell)
             await DropTaskAllDay.InvokeAsync(dragDropParameter);
         else
             await DropTask.InvokeAsync(dragDropParameter);

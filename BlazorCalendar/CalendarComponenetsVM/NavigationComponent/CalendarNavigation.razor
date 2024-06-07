@@ -1,0 +1,69 @@
+﻿<div class="d-flex flex-row mb-2">
+    <button type="button" @onclick="GoToday" class="btn">📅 Go Today</button>
+    <button type="button" @onclick="@(m => ClicMonthNavigate.InvokeAsync(-SkipMonth()))" class="btn">🔼</button>
+    <button type="button" @onclick="@(m => ClicMonthNavigate.InvokeAsync(SkipMonth()))" class="btn me-2">🔽</button>
+    <input type="date" class="me-2" value="@(FirstDate.ToString("yyyy-MM-dd"))" @onchange="@(e => ChangeFirstDate(e.Value.ToString()))" />
+
+    <select @onchange="TimeDivisionChanged" class="me-2">
+        <option value="@TimeDivisionEnum.TwoHours">Two Hours</option>
+        <option selected value="@TimeDivisionEnum.Hour">Hour</option>
+        <option value="@TimeDivisionEnum.ThirtyMinutes">Thirty Minutes</option>
+        <option value="@TimeDivisionEnum.FifteenMinutes">Fifteen Minutes</option>
+    </select>
+</div>
+
+@code {
+    [Parameter]
+    public DisplayedView SelectedViewType { get; set; }
+
+    [Parameter]
+    public EventCallback<int> ClicMonthNavigate { get; set; }
+
+    [Parameter]
+    public EventCallback<TimeDivisionEnum> ClickTimeDivision { get; set; }
+
+    [Parameter]
+    public EventCallback<string> FirstDateCallBack { get; set; }
+
+    [Parameter]
+    public EventCallback GoTodayCallBack { get; set; }
+
+    private DateTime FirstDate { get; set; } = DateTime.Today;
+
+    private TimeDivisionEnum TimeDivisionEnum { get; set; } = TimeDivisionEnum.Hour;
+
+    private Task GoToday()
+    {
+        FirstDate = DateTime.Today;
+        return GoTodayCallBack.InvokeAsync();
+    }
+
+    private Task ChangeFirstDate(string date)
+    {
+        if (DateTime.TryParse(date, out var parsedDate))
+        {
+            FirstDate = parsedDate;
+        }
+        return FirstDateCallBack.InvokeAsync(date);
+    }
+
+    private int SkipMonth()
+    {
+        return SelectedViewType switch
+        {
+            DisplayedView.Monthly => 1,
+            DisplayedView.Weekly => 7,
+            _ => 0
+        };
+    }
+
+    private Task TimeDivisionChanged(ChangeEventArgs e)
+    {
+        if (Enum.TryParse(e.Value.ToString(), out TimeDivisionEnum newValue))
+        {
+            TimeDivisionEnum = newValue;
+            return ClickTimeDivision.InvokeAsync(TimeDivisionEnum);
+        }
+        return Task.CompletedTask;
+    }
+}

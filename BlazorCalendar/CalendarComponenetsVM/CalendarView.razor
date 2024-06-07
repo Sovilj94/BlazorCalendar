@@ -3,40 +3,23 @@
 @using BlazorCalendar.Models.ViewModel.Interfaces
 @using System.Globalization
 @using BlazorCalendar.Services
+@using BlazorCalendar.CalendarComponenetsVM.NavigationComponent
 
 @inherits CalendarBase
 @inject TasksService TasksService
 
-<div class="d-flex flex-row mb-2">
-    <button type="button" @onclick="GoToday" class="btn">📅 Go Today</button>
-    <button type="button" @onclick="@(m => ClicMonthNavigate(-7))" class="btn">🔼</button>
-    <button type="button" @onclick="@(m => ClicMonthNavigate(7))" class="btn me-2">🔽</button>
-    <input type="date" class="me-2" value="@(FirstDate.ToString("yyyy-MM-dd"))" @onchange="@(e => ChangeFirstDate(e.Value.ToString()))" />
+<CalendarNavigation
+        SelectedViewType="SelectedViewType"
+        ClicMonthNavigate="ClicMonthNavigate"
+        FirstDateCallBack="ChangeFirstDate"
+        GoTodayCallBack="GoToday"
+        ClickTimeDivision="HandleTimeDivisionChanged"
+></CalendarNavigation>
 
-    <select @bind="@TimeDivisionEnum" class="me-2">
-        <option value="@TimeDivisionEnum.TwoHours">Two Hours</option>
-        <option value="@TimeDivisionEnum.Hour">Hour </option>
-        <option value="@TimeDivisionEnum.ThirtyMinutes">Thirty Minutes</option>
-        <option value="@TimeDivisionEnum.FifteenMinutes">Fifteen Minutes</option>
-    </select>
-    <div>
-        <input type="checkbox" @bind="draggable" id="is-draggable" />
-        <label for="is-draggable">Draggable</label>
-    </div>
-
-    <div>
-        <select @bind="SelectedViewType" class="me-2">
-            <option value="@DisplayedView.Annual">Annual View</option>
-            <option value="@DisplayedView.Monthly">Monthly View</option>
-            <option value="@DisplayedView.Weekly">Weekly View</option>
-            <option value="@DisplayedView.Daily">Daily View</option>
-        </select>
-    </div>
-</div>
 
 @if (SelectedViewType == DisplayedView.Weekly)
 {
-    <WeekViewVM Draggable="Draggable"
+    <WeekView Draggable="Draggable"
                 OutsideCurrentMonthClick="OutsideCurrentMonthClick"
                 TaskClick="TaskClick"
                 DayClick="DayClick"
@@ -45,7 +28,7 @@
                 DropTaskAllDay="DropTaskAllDay"
                 HighlightToday="true"
                 TimeDivisionEnum="TimeDivisionEnum"
-                WeekCalendar="WeekCalendarViewModel" />
+                CalendarViewModel="WeekCalendarViewModel" />
 }
 else if (SelectedViewType == DisplayedView.Daily)
 {
@@ -61,12 +44,14 @@ else if (SelectedViewType == DisplayedView.Daily)
     public DayOfWeek FirstDayOfWeek { get; set; }
 
     public TimeDivisionEnum TimeDivisionEnum { get; set; } = TimeDivisionEnum.Hour;
-    private DisplayedView SelectedViewType = DisplayedView.Weekly;
+
+    [Parameter]
+    public DisplayedView SelectedViewType { get; set; } = DisplayedView.Weekly;
 
     public CultureInfo culture = CultureInfo.CurrentCulture;
 
 
-    public ICalendarView CalendarViewModel { get; set; } = new WeekCalendarViewModel();
+    public ICalendarView CalendarViewModel { get; set; }
 
     public WeekCalendarViewModel WeekCalendarViewModel { get; set; } = new WeekCalendarViewModel();
 
@@ -149,7 +134,7 @@ else if (SelectedViewType == DisplayedView.Daily)
         droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
         droppedTask.DateStart = dragDropParameter.Day;
 
-        WeekCalendarViewModel.DayCalendar.ForEach(x => x.DayTasks = TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks));
+        WeekCalendarViewModel.DayCalendar.ForEach(x => x.DayTasks = TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks,TimeDivisionEnum));
 
         if (DayCalendarDropped.DayTasks.Count != 0)
             DayCalendarDropped.MaxNumberOfColumns = DayCalendarDropped.DayTasks.Max(x => x.ColumnStart);
@@ -187,7 +172,7 @@ else if (SelectedViewType == DisplayedView.Daily)
         weekCalendarViewModel.TimeSideBar = new TimeSideBarViewModel();
         weekCalendarViewModel.Tasks = new List<Tasks>();
 
-        weekCalendarViewModel.Tasks = TasksService.GetTasksForWeekViewModel(FirstDateWeek, lastDateOfWeek, TasksService.GetAllTasks());
+        weekCalendarViewModel.Tasks = TasksService.GetTasksForWeekViewModel(FirstDateWeek, lastDateOfWeek, TasksService.GetAllTasks(),TimeDivisionEnum);
 
         @for (int i = 0; i < 7; i++)
         {
@@ -203,7 +188,7 @@ else if (SelectedViewType == DisplayedView.Daily)
             DayCalendar.WeekDaysColor = WeekDaysColor;
             DayCalendar.TimeDivision = new TimeDivision(TimeDivisionEnum);
             DayCalendar.Day = day;
-            DayCalendar.DayTasks = TasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks);
+            DayCalendar.DayTasks = TasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks,TimeDivisionEnum);
 
             if (DayCalendar.DayTasks != null && DayCalendar.DayTasks.Count != 0)
                 DayCalendar.MaxNumberOfColumns = DayCalendar.DayTasks.Max(x => x.ColumnStart);
@@ -229,6 +214,13 @@ else if (SelectedViewType == DisplayedView.Daily)
         WeekCalendarViewModel.DayCalendar.ForEach(x => x.TimeDivision = new TimeDivision(TimeDivisionEnum));
         WeekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
         StateHasChanged();
+    }
+
+    private Task HandleTimeDivisionChanged(TimeDivisionEnum newTimeDivision)
+    {
+        TimeDivisionEnum = newTimeDivision;
+        RefreshCalendarModel();
+        return Task.CompletedTask;
     }
 }
 

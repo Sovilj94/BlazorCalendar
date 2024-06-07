@@ -1,6 +1,7 @@
 ﻿@using BlazorCalendar.Models
 @using BlazorCalendar.Models.ViewModel
 @using BlazorCalendar.Styles
+@using BlazorCalendar.CalendarComponenetsVM
 
 
 <div class="all-day-grid">
@@ -11,13 +12,13 @@
         AllDay.TimeCell.IsAllDayTimesCell = true;
         AllDay.TimeCell.Time = AllDay.FirstDateWeek.AddDays(column);
         AllDay.TimeCell.CSSGridPosition = $"grid-row:1 / span 5; grid-column-start:{column + 2}; height:100px; border-right:1px solid #ccc";
-        <TimeCellVM DayClick="DayClick"
+        <TimeCell DayClick="DayClick"
                     EmptyDayClick="EmptyDayClick"
                     Draggable="Draggable"
                     DropTask="DropTask"
                     DropTaskAllDay="DropTaskAllDay"
-                    TimeCell="AllDay.TimeCell">
-        </TimeCellVM>
+                    TimeCellViewModel="AllDay.TimeCell">
+        </TimeCell>
     }
     @if (AllDay.Tasks is not null && AllDay.Tasks.Count > 0)
     {
@@ -40,11 +41,11 @@
 
                 AllDay.GridItem.CSSGridPosition = CSSGridPosition;
 
-                <GridItemVM GridItem="AllDay.GridItem"
+                <GridItem GridItemViewModel="AllDay.GridItem"
                             Draggable="Draggable"
                             DragStart="DragStart"
                             TaskClick="TaskClick">
-                </GridItemVM>
+                </GridItem>
             }
         }
     }

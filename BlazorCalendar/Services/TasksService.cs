@@ -29,21 +29,21 @@ namespace BlazorCalendar.Services
         }
 
 
-        public List<Tasks> GetTasksForWeekViewModel(DateTime FirstDate, DateTime LastDate, List<Tasks> tasks)
+        public List<Tasks> GetTasksForWeekViewModel(DateTime FirstDate, DateTime LastDate, List<Tasks> tasks,TimeDivisionEnum timeDivisionEnum)
         {
-            var TasksList = tasks.Where(x => x.DateStart.Date >= FirstDate.Date && x.DateStart <= LastDate &&
+            var TasksList = tasks.Where(x => x.DateStart.Date >= FirstDate.Date && x.DateStart.Date <= LastDate.Date &&
                                 (x.DateStart.TimeOfDay != TimeSpan.Zero && x.DateEnd.TimeOfDay != TimeSpan.Zero)).ToList();
 
-            TasksList = GetTaskPositionForDayGrid(TasksList, 60);
+            TasksList = GetTaskPositionForDayGrid(TasksList, new TimeDivision(timeDivisionEnum).Minutes);
 
             return TasksList;
         }
 
-        public List<Tasks> GetTasksForDayViewModel(DateTime day, List<Tasks> tasks)
+        public List<Tasks> GetTasksForDayViewModel(DateTime day, List<Tasks> tasks, TimeDivisionEnum timeDivisionEnum)
         {
             var TasksList = tasks.Where(x => (x.DateStart.Date == day.Date || x.DateEnd.Date == day.Date) && x.DateStart.TimeOfDay != TimeSpan.Zero || x.DateEnd.TimeOfDay != TimeSpan.Zero).ToList();
 
-            TasksList = GetTaskPositionForDayGrid(TasksList, 60);
+            TasksList = GetTaskPositionForDayGrid(TasksList, new TimeDivision(timeDivisionEnum).Minutes);
 
             return TasksList;
         }

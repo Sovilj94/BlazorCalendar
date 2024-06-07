@@ -6,27 +6,27 @@
          ondragover="event.preventDefault();this.style.fontWeight = '600';"
          ondragleave="this.style.fontWeight='100';"
          @ondrop:preventDefault="true">
-        <span>@TimeSideBar.Title</span>
+        <span>@TimeSideBarViewModel.Title</span>
     </div>
 
 </div>
 <div class="hour-grid" style="grid-column-start:1; grid-row-start:3">
 
-    @for (int dayTime = 0; dayTime < TimeSideBar!.TimeDivision.NumberOfCells; dayTime++)
+    @for (int dayTime = 0; dayTime < TimeSideBarViewModel!.TimeDivision.NumberOfCells; dayTime++)
     {
-        TimeSideBar.Time = DateTime.Today.AddMinutes(dayTime * TimeSideBar.TimeDivision.Minutes);
-        TimeSideBar.Time.AddMinutes(dayTime * TimeSideBar.TimeDivision.Minutes);
+        TimeSideBarViewModel.Time = DateTime.Today.AddMinutes(dayTime * TimeSideBarViewModel.TimeDivision.Minutes);
+        TimeSideBarViewModel.Time.AddMinutes(dayTime * TimeSideBarViewModel.TimeDivision.Minutes);
 
 
         <div class="hour noselect" style="text-align:center; height:50px">
-            @TimeSideBar.Time.ToString("HH:mm")
+            @TimeSideBarViewModel.Time.ToString("HH:mm")
         </div>
     }
 </div>
 
 @code {
     [Parameter]
-    public TimeSideBarViewModel TimeSideBar { get; set; } = new TimeSideBarViewModel();
+    public TimeSideBarViewModel TimeSideBarViewModel { get; set; } = new TimeSideBarViewModel();
 
 
 }

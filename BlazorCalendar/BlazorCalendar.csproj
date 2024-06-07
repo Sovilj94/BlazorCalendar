@@ -19,16 +19,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Content Remove="SedmicniView.razor" />
+	  <Compile Remove="CalendarComponents\**" />
+	  <Content Remove="CalendarComponents\**" />
+	  <EmbeddedResource Remove="CalendarComponents\**" />
+	  <None Remove="CalendarComponents\**" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <None Remove="CalendarComponenetsVM\DayColumnVM.razor.css" />
-	  <None Remove="CalendarComponents\DayColumn.razor.css" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="SedmicniView.razor" />
 		<None Include="wwwroot\BlazorCalendar.css" />
 	</ItemGroup>
 
@@ -50,19 +51,6 @@
 
 	<ItemGroup>
 		<None Include="icon.png" Pack="true" PackagePath="\" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <UpToDateCheckInput Remove="SedmicniView.razor" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <_ContentIncludedByDefault Remove="SedmicniView.razor" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Include="CalendarComponenetsVM\DayColumnVM.razor.css" />
-	  <Content Include="CalendarComponents\DayColumn.razor.css" />
 	</ItemGroup>
 
 </Project>

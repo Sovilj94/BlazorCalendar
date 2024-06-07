@@ -1,0 +1,108 @@
+﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.ViewModel
+@using BlazorCalendar.Services
+@using BlazorCalendar.Styles
+
+@inject TasksService TasksService
+
+<div class="dayGrid">
+
+    @for (int dayTime = 0; dayTime < DayCalendarViewModel.TimeDivision.NumberOfCells; dayTime++)
+    {
+        DateTime time = DayCalendarViewModel.Day.AddMinutes(dayTime * DayCalendarViewModel.TimeDivision.Minutes);
+        int row = dayTime + 1;
+
+        DayCalendarViewModel.TimeCell = new TimeCellViewModel();
+        DayCalendarViewModel.TimeCell.CSSGridPosition = $"grid-row:{row}; grid-column:1 / span {DayCalendarViewModel.MaxNumberOfColumns};";
+        DayCalendarViewModel.TimeCell.Time = time;
+        DayCalendarViewModel.TimeCell.CSSbackground = GetBackground(DayCalendarViewModel.Day);
+
+        <TimeCell DayClick="DayClick"
+                    EmptyDayClick="EmptyDayClick"
+                    Draggable="Draggable"
+                    DropTask="DropTask"
+                  TimeCellViewModel="DayCalendarViewModel.TimeCell">
+        </TimeCell>
+    }
+
+    @if (DayCalendarViewModel.DayTasks is not null && DayCalendarViewModel.DayTasks.Count != 0)
+    {
+        for (var k = 0; k < DayCalendarViewModel.DayTasks.Count; k++)
+        {
+            Tasks t = DayCalendarViewModel.DayTasks[k];
+
+            if (t.DateStart.Date == DayCalendarViewModel.Day.Date)
+            {
+                if (t.RowEnd - t.RowStart != 0)
+                {
+                    DayCalendarViewModel.GridItem = new GridItemViewModel();
+                    DayCalendarViewModel.GridItem.Task = t;
+                    DayCalendarViewModel.GridItem.Day = DayCalendarViewModel.Day;
+                    DayCalendarViewModel.GridItem.TaskColor = Colors.GetHatching(t.FillStyle, t.Color);
+                    DayCalendarViewModel.GridItem.TaskColor = $"{DayCalendarViewModel.GridItem.TaskColor};color:{t.ForeColor}";
+
+                    DayCalendarViewModel.GridItem.ClassPin = string.IsNullOrWhiteSpace(t.Comment) ? null : " pin";
+                    DayCalendarViewModel.GridItem.ClassPointer = " cursor-pointer";
+
+                    string gridRow = $"grid-row: {t.RowStart} / span {t.RowEnd - t.RowStart};";
+                    string gridColumn = $"grid-column-start: {t.ColumnStart};";
+
+                    string CSSGridPoition = $"{gridRow} {gridColumn}";
+
+                    DayCalendarViewModel.GridItem.CSSGridPosition = CSSGridPoition;
+
+                    <GridItem GridItemViewModel="DayCalendarViewModel.GridItem"
+                                Draggable="Draggable"
+                                DragStart="DragStart"
+                                TaskClick="TaskClick">
+                    </GridItem>
+                }
+            }
+
+        }
+    }
+</div>
+
+
+@code {
+
+    public int MaxNumberOfColumnsInDay { get; set; }
+
+    [Parameter]
+    public DayCalendarViewModel DayCalendarViewModel { get; set; }
+
+    [Parameter]
+    public bool Draggable { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> EmptyDayClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickTaskParameter> TaskClick { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DragStart { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DropTask { get; set; }
+
+
+    private string GetBackground(DateTime day)
+    {
+        int d = (int)day.DayOfWeek;
+
+        if (d == 6)
+        {
+            return $"background:{DayCalendarViewModel.SaturdayColor}";
+        }
+        else if (d == 0)
+        {
+            return $"background:{DayCalendarViewModel.SundayColor}";
+        }
+
+        return $"background:{DayCalendarViewModel.WeekDaysColor}";
+    }
+}
