@@ -18,7 +18,6 @@ namespace BlazorCalendar.Services
                  new Tasks { ID = 2, DateStart = today.AddDays(-2).AddHours(8), DateEnd = today.AddDays(-2).AddHours(20), Code = "POD", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
                  new Tasks { ID = 3, DateStart = today.AddHours(5), DateEnd = today.AddHours(10), Code = "CALL", Color = "#eb3c37", ForeColor = "#222", Caption = "Lorem ipsum dolor sit amet", FillStyle=FillStyleEnum.CrossDots },
                  new Tasks { ID = 4, DateStart = today.AddDays(31), DateEnd = today.AddDays(31), Code = "MTG", Color = "#19C319", Caption = "MTG:France" },
-                 new Tasks { ID = 4, DateStart = today.AddDays(31), DateEnd = today.AddDays(31), Code = "MTG", Color = "#19C319", Caption = "MTG:France" },
                  new Tasks { ID = 6, DateStart = today.AddDays(32), DateEnd = today.AddDays(33), Code = "MEET", Color = "#0d6efd" },
                  new Tasks { ID = 7, DateStart = today.AddDays(32), DateEnd = today.AddDays(32), Code = "BLAZOR", Color = "#FFC3FF", Caption = "Blazor Dev" } ,
                  new Tasks { ID = 8, DateStart = today.AddDays(45).AddHours(8), DateEnd = today.AddDays(45).AddHours(9), Code = "MEETING", Color = "#2DD7D7", Comment="Julien's test" },
@@ -235,14 +234,16 @@ namespace BlazorCalendar.Services
             }
 
 
-            if(gridItems.Count > 1)
+            if (gridItems.Count > 0)
             {
+                // Initialize the first item
+                gridItems[0].RowStart = 1;
+                gridItems[0].CSSGridPosition = $"grid-row-start:{gridItems[0].RowStart}; grid-column:{gridItems[0].ColumnStart} / span {gridItems[0].ColumnEnd - gridItems[0].ColumnStart};";
+
                 for (int i = 1; i < gridItems.Count; i++)
                 {
-                    gridItems[0].RowStart = 1;
-                    gridItems[0].CSSGridPosition = $"grid-row-start:{gridItems[0].RowStart} ;grid-column:{gridItems[0].ColumnStart} / span {gridItems[0].ColumnEnd - gridItems[0].ColumnStart} ;";
-
-                    if (gridItems[i].ColumnStart < gridItems[0].ColumnEnd)
+                    // Determine the RowStart based on the previous item's ColumnEnd
+                    if (gridItems[i].ColumnStart < gridItems[i - 1].ColumnEnd)
                     {
                         gridItems[i].RowStart = gridItems[i - 1].RowStart + 1;
                     }
@@ -250,13 +251,10 @@ namespace BlazorCalendar.Services
                     {
                         gridItems[i].RowStart = 1;
                     }
-                    gridItems[i].CSSGridPosition = $"grid-row-start:{gridItems[i].RowStart} ;grid-column:{gridItems[i].ColumnStart} / span {gridItems[i].ColumnEnd - gridItems[i].ColumnStart} ;";
+
+                    // Update CSSGridPosition for the current item
+                    gridItems[i].CSSGridPosition = $"grid-row-start:{gridItems[i].RowStart}; grid-column:{gridItems[i].ColumnStart} / span {gridItems[i].ColumnEnd - gridItems[i].ColumnStart};";
                 }
-            }
-            else
-            {
-                gridItems[0].RowStart = 1;
-                gridItems[0].CSSGridPosition = $"grid-row-start:{gridItems[0].RowStart} ;grid-column:{gridItems[0].ColumnStart} / span {gridItems[0].ColumnEnd - gridItems[0].ColumnStart} ;";
             }
 
             return gridItems;

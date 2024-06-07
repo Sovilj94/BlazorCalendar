@@ -1,11 +1,13 @@
 ﻿
+using BlazorCalendar.Models.Interfaces;
+
 namespace BlazorCalendar.Models.ViewModel
 {
     public class GridItemViewModel
     {
         public DateTime Day { get; set; }
 
-        public Tasks Task { get; set; }
+        public ICalendarEvent Task { get; set; }
 
         public string CSSGridPosition { get; set; }
 

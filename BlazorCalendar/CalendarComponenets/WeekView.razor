@@ -16,8 +16,8 @@
     @for (int i = 0; i < WeekCalendarViewModel.DayHeader.Count; i++)
     {
         <div class="day-header-column" style="grid-column-start: @(i+2);">
-            <DayHeaderVM DayHeader="WeekCalendarViewModel.DayHeader[i]">
-            </DayHeaderVM>
+            <DayHeader DayHeaderViewModel="WeekCalendarViewModel.DayHeader[i]">
+            </DayHeader>
         </div>
     }
 

@@ -34,18 +34,41 @@ namespace BlazorCalendar.Services
 
         private ICalendarView CreateWeekCalendarView(DateTime firstDate, TimeDivisionEnum timeDivision)
         {
-            var weekCalendarViewModel = new WeekCalendarViewModel();
-
+            // Prvi i zadnji dan u sedmici
             var firstDayOfWeek = _culture.DateTimeFormat.FirstDayOfWeek;
             var firstDateWeek = firstDate.AddDays(-(firstDate.DayOfWeek - firstDayOfWeek));
             var lastDateOfWeek = firstDateWeek.AddDays(6);
 
+            // Inicijalizacija view modela
+            WeekCalendarViewModel weekCalendarViewModel = new WeekCalendarViewModel();
             weekCalendarViewModel.DayHeader = new List<DayHeaderViewModel>();
-            weekCalendarViewModel.DayCalendar = new List<DayCalendarViewModel>();
             weekCalendarViewModel.AllDay = new AllDayViewModel();
             weekCalendarViewModel.TimeSideBar = new TimeSideBarViewModel();
+            weekCalendarViewModel.DayCalendar = new List<DayCalendarViewModel>();
             weekCalendarViewModel.Tasks = _tasksService.GetTasksForWeekViewModel(firstDateWeek, lastDateOfWeek, _tasksService.GetAllTasks(), timeDivision);
 
+            // Popunjavanje AllDayViewModela
+            weekCalendarViewModel.AllDay.Tasks = _tasksService.GetAllDayTaskPositionForDayGrid(_tasksService.GetAllTasks(), firstDateWeek);
+            weekCalendarViewModel.AllDay.FirstDateWeek = firstDateWeek;
+            weekCalendarViewModel.AllDay.TimeCells = new List<TimeCellViewModel>();
+            weekCalendarViewModel.AllDay.GridItems = new List<GridItemViewModel>();
+            weekCalendarViewModel.AllDay.GridItems = _tasksService.GetGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Tasks, firstDateWeek);
+
+            // TimeCells
+            for (int column = 0; column < 7; column++)
+            {
+                TimeCellViewModel timeCell = new TimeCellViewModel();
+                timeCell.IsAllDayTimesCell = true;
+                timeCell.Time = weekCalendarViewModel.AllDay.FirstDateWeek.AddDays(column);
+                timeCell.CSSGridPosition = $"grid-row:1 / span 5; grid-column-start:{column + 2}; height:100px; border-right:1px solid #ccc";
+
+                weekCalendarViewModel.AllDay.TimeCells.Add(timeCell);
+            }
+
+            // TimeSideBar
+            weekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(timeDivision);
+
+            // Popunjavanje DayHeaderViewModel i DayCalendarViewModel
             for (int i = 0; i < 7; i++)
             {
                 int d = Dates.GetNumOfDay(i);
@@ -72,6 +95,7 @@ namespace BlazorCalendar.Services
                 {
                     dayCalendar.MaxNumberOfColumns = 1;
                 }
+
                 for (int dayTime = 0; dayTime < dayCalendar.TimeDivision.NumberOfCells; dayTime++)
                 {
                     DateTime time = dayCalendar.Day.AddMinutes(dayTime * dayCalendar.TimeDivision.Minutes);
@@ -87,28 +111,9 @@ namespace BlazorCalendar.Services
                     dayCalendar.TimeCells.Add(timeCell);
                 }
 
-
                 weekCalendarViewModel.DayHeader.Add(dayHeader);
                 weekCalendarViewModel.DayCalendar.Add(dayCalendar);
             }
-
-            weekCalendarViewModel.AllDay.Tasks = _tasksService.GetAllDayTaskPositionForDayGrid(_tasksService.GetAllTasks(), firstDateWeek);
-            weekCalendarViewModel.AllDay.FirstDateWeek = firstDateWeek;
-            weekCalendarViewModel.AllDay.TimeCells = new List<TimeCellViewModel>();
-            weekCalendarViewModel.AllDay.GridItems = new List<GridItemViewModel>();
-            weekCalendarViewModel.AllDay.GridItems = _tasksService.GetGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Tasks, firstDateWeek);
-
-            for (int column = 0; column < 7; column++)
-            {
-                TimeCellViewModel timeCell = new TimeCellViewModel();
-                timeCell.IsAllDayTimesCell = true;
-                timeCell.Time = weekCalendarViewModel.AllDay.FirstDateWeek.AddDays(column);
-                timeCell.CSSGridPosition = $"grid-row:1 / span 5; grid-column-start:{column + 2}; height:100px; border-right:1px solid #ccc";
-
-                weekCalendarViewModel.AllDay.TimeCells.Add(timeCell);
-            }
-
-            weekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(timeDivision);
 
             return weekCalendarViewModel;
         }

@@ -1,9 +1,10 @@
 ﻿namespace BlazorCalendar.Models;
 
+using BlazorCalendar.Models.Interfaces;
 using System.Diagnostics;
 
 [DebuggerDisplay("{ID} {Code} {DateStart}")]
-public sealed class Tasks
+public sealed class Tasks : ICalendarEvent
 {
     public int ID { get; set; }
     public string? Key { get; set; }
