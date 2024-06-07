@@ -6,68 +6,50 @@
 @using BlazorCalendar.CalendarComponenets.NavigationComponent
 
 @inherits CalendarBase
+
 @inject TasksService TasksService
+@inject ICalendarViewFactory CalendarViewFactory
 
-<CalendarNavigation
-        SelectedViewType="SelectedViewType"
-        ClicMonthNavigate="ClicMonthNavigate"
-        FirstDateCallBack="ChangeFirstDate"
-        GoTodayCallBack="GoToday"
-        ClickTimeDivision="HandleTimeDivisionChanged"
-></CalendarNavigation>
-
+<CalendarNavigation SelectedViewType="SelectedViewType"
+                    ClicMonthNavigate="ClicMonthNavigate"
+                    FirstDateCallBack="ChangeFirstDate"
+                    GoTodayCallBack="GoToday"
+                    ClickTimeDivision="HandleTimeDivisionChanged">
+</CalendarNavigation>
 
 @if (SelectedViewType == DisplayedView.Weekly)
 {
     <WeekView Draggable="Draggable"
-                OutsideCurrentMonthClick="OutsideCurrentMonthClick"
-                HighlightToday="true"
-                TimeDivisionEnum="TimeDivisionEnum"
-                CalendarViewModel="WeekCalendarViewModel" />
+              HighlightToday="true"
+              TimeDivisionEnum="TimeDivisionEnum"
+              CalendarViewModel="CalendarViewModel">
+    </WeekView>
 }
 else if (SelectedViewType == DisplayedView.Daily)
 {
     <div>Daily View</div>
 }
 
-
 @code {
-    public DateTime FirstDateWeek { get; set; }
     public DateTime FirstDate { get; set; }
-    public DayOfWeek FirstDayOfWeek { get; set; }
 
     public TimeDivisionEnum TimeDivisionEnum { get; set; } = TimeDivisionEnum.Hour;
+
+    public ICalendarView CalendarViewModel { get; set; }
 
     [Parameter]
     public DisplayedView SelectedViewType { get; set; } = DisplayedView.Weekly;
 
-    public CultureInfo culture = CultureInfo.CurrentCulture;
-
-
-    public ICalendarView CalendarViewModel { get; set; }
-
-    public WeekCalendarViewModel WeekCalendarViewModel { get; set; } = new WeekCalendarViewModel();
-
-
-    public string[] dayNames = { "Ned", "Pon", "Uto", "Sre", "Čet", "Pet", "Sub" };
-
-
-    private bool draggable = true;
-
     protected override void OnInitialized()
     {
         FirstDate = DateTime.Today;
-        CalendarViewModel = PopulateViewModel();
-        WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
+        CalendarViewModel = CalendarViewFactory.CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
 
     }
 
     protected override void OnParametersSet()
     {
-        CalendarViewModel = PopulateViewModel();
-        WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
-        WeekCalendarViewModel.DayCalendar.ForEach(x => x.TimeDivision = new TimeDivision(TimeDivisionEnum));
-        WeekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
+        CalendarViewModel = CalendarViewFactory.CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
     }
 
     private void ChangeFirstDate(string value)
@@ -89,66 +71,9 @@ else if (SelectedViewType == DisplayedView.Daily)
         RefreshCalendarModel();
     }
 
-    private void OutsideCurrentMonthClick(int MonthAdded)
-    {
-        FirstDate = FirstDate.AddMonths(MonthAdded);
-        RefreshCalendarModel();
-    }
-
-    private ICalendarView PopulateViewModel()
-    {
-        WeekCalendarViewModel weekCalendarViewModel = new WeekCalendarViewModel();
-
-        FirstDayOfWeek = culture.DateTimeFormat.FirstDayOfWeek;
-        FirstDateWeek = FirstDate.AddDays(-(FirstDate.DayOfWeek - FirstDayOfWeek));
-        var lastDateOfWeek = FirstDateWeek.AddDays(6);
-        weekCalendarViewModel.DayHeader = new List<DayHeaderViewModel>();
-        weekCalendarViewModel.DayCalendar = new List<DayCalendarViewModel>();
-        weekCalendarViewModel.AllDay = new AllDayViewModel();
-        weekCalendarViewModel.TimeSideBar = new TimeSideBarViewModel();
-        weekCalendarViewModel.Tasks = new List<Tasks>();
-
-        weekCalendarViewModel.Tasks = TasksService.GetTasksForWeekViewModel(FirstDateWeek, lastDateOfWeek, TasksService.GetAllTasks(),TimeDivisionEnum);
-
-        @for (int i = 0; i < 7; i++)
-        {
-            int d = Dates.GetNumOfDay(i);
-            DateTime day = FirstDateWeek.AddDays(i);
-            DayHeaderViewModel DayHeader = new DayHeaderViewModel();
-            DayHeader.DayName = dayNames[d];
-            DayHeader.DayDate = day.ToString("dd.MM");
-
-            DayCalendarViewModel DayCalendar = new DayCalendarViewModel();
-            DayCalendar.SaturdayColor = SaturdayColor;
-            DayCalendar.SundayColor = SundayColor;
-            DayCalendar.WeekDaysColor = WeekDaysColor;
-            DayCalendar.TimeDivision = new TimeDivision(TimeDivisionEnum);
-            DayCalendar.Day = day;
-            DayCalendar.DayTasks = TasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks,TimeDivisionEnum);
-
-            if (DayCalendar.DayTasks != null && DayCalendar.DayTasks.Count != 0)
-                DayCalendar.MaxNumberOfColumns = DayCalendar.DayTasks.Max(x => x.ColumnStart);
-            else
-                DayCalendar.MaxNumberOfColumns = 1;
-
-            weekCalendarViewModel.DayHeader.Add(DayHeader);
-            weekCalendarViewModel.DayCalendar.Add(DayCalendar);
-        }
-
-        weekCalendarViewModel.AllDay.Tasks = TasksService.GetAllDayTaskPositionForDayGrid(TasksService.GetAllTasks(), FirstDateWeek);
-        weekCalendarViewModel.AllDay.FirstDateWeek = FirstDateWeek;
-
-        weekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
-
-        return weekCalendarViewModel;
-    }
-
     private void RefreshCalendarModel()
     {
-        CalendarViewModel = PopulateViewModel();
-        WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
-        WeekCalendarViewModel.DayCalendar.ForEach(x => x.TimeDivision = new TimeDivision(TimeDivisionEnum));
-        WeekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(TimeDivisionEnum);
+        CalendarViewModel = CalendarViewFactory.CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
         StateHasChanged();
     }
 

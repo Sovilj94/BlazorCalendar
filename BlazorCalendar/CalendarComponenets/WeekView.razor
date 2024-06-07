@@ -72,9 +72,6 @@
     [Parameter]
     public bool HighlightToday { get; set; } = false;
 
-    [Parameter]
-    public EventCallback<int> OutsideCurrentMonthClick { get; set; }
-
     private void TaskClick(ClickTaskParameter clickTaskParameter)
     {
         fakeConsole = "ID task(s) :" + string.Join(", ", clickTaskParameter.IDList);
