@@ -18,7 +18,6 @@
         DayCalendarViewModel.TimeCell.CSSbackground = GetBackground(DayCalendarViewModel.Day);
 
         <TimeCell DayClick="DayClick"
-                    EmptyDayClick="EmptyDayClick"
                     Draggable="Draggable"
                     DropTask="DropTask"
                   TimeCellViewModel="DayCalendarViewModel.TimeCell">
@@ -76,9 +75,6 @@
 
     [Parameter]
     public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
-
-    [Parameter]
-    public EventCallback<ClickEmptyDayParameter> EmptyDayClick { get; set; }
 
     [Parameter]
     public EventCallback<ClickTaskParameter> TaskClick { get; set; }

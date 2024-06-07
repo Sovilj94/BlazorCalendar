@@ -28,9 +28,6 @@
     [Parameter]
     public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
 
-    [Parameter]
-    public EventCallback<ClickEmptyDayParameter> EmptyDayClick { get; set; }
-
     private Tasks TaskDragged => TaskDraggedService.TaskDragged;
 
     private async Task HandleDayOnDrop(DateTime day)
