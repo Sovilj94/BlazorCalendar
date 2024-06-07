@@ -1,4 +1,4 @@
-﻿using BlazorCalendar.Models.ViewModel.Interfaces;
+﻿using BlazorCalendar.Models.Interfaces;
 
 namespace BlazorCalendar.Models.ViewModel
 {

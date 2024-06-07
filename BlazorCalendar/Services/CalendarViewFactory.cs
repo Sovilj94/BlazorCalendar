@@ -1,8 +1,8 @@
-﻿using BlazorCalendar.Models;
+﻿using BlazorCalendar.CalendarComponenets;
+using BlazorCalendar.Models;
+using BlazorCalendar.Models.Interfaces;
 using BlazorCalendar.Models.ViewModel;
-using BlazorCalendar.Models.ViewModel.Interfaces;
-using System;
-using System.Collections.Generic;
+using System.Data.Common;
 using System.Globalization;
 
 namespace BlazorCalendar.Services
@@ -60,7 +60,8 @@ namespace BlazorCalendar.Services
                 {
                     Day = day,
                     TimeDivision = new TimeDivision(timeDivision),
-                    DayTasks = _tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks, timeDivision)
+                    DayTasks = _tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks, timeDivision),
+                    TimeCells = new List<TimeCellViewModel>()
                 };
 
                 if (dayCalendar.DayTasks != null && dayCalendar.DayTasks.Count != 0)
@@ -71,6 +72,21 @@ namespace BlazorCalendar.Services
                 {
                     dayCalendar.MaxNumberOfColumns = 1;
                 }
+                for (int dayTime = 0; dayTime < dayCalendar.TimeDivision.NumberOfCells; dayTime++)
+                {
+                    DateTime time = dayCalendar.Day.AddMinutes(dayTime * dayCalendar.TimeDivision.Minutes);
+                    int row = dayTime + 1;
+
+                    TimeCellViewModel timeCell = new TimeCellViewModel();
+
+                    timeCell = new TimeCellViewModel();
+                    timeCell.CSSGridPosition = $"grid-row:{row}; grid-column:1 / span {dayCalendar.MaxNumberOfColumns};";
+                    timeCell.Time = time;
+                    timeCell.CSSbackground = GetBackground(dayCalendar.Day, dayCalendar);
+
+                    dayCalendar.TimeCells.Add(timeCell);
+                }
+
 
                 weekCalendarViewModel.DayHeader.Add(dayHeader);
                 weekCalendarViewModel.DayCalendar.Add(dayCalendar);
@@ -78,9 +94,38 @@ namespace BlazorCalendar.Services
 
             weekCalendarViewModel.AllDay.Tasks = _tasksService.GetAllDayTaskPositionForDayGrid(_tasksService.GetAllTasks(), firstDateWeek);
             weekCalendarViewModel.AllDay.FirstDateWeek = firstDateWeek;
+            weekCalendarViewModel.AllDay.TimeCells = new List<TimeCellViewModel>();
+            weekCalendarViewModel.AllDay.GridItems = new List<GridItemViewModel>();
+            weekCalendarViewModel.AllDay.GridItems = _tasksService.GetGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Tasks, firstDateWeek);
+
+            for (int column = 0; column < 7; column++)
+            {
+                TimeCellViewModel timeCell = new TimeCellViewModel();
+                timeCell.IsAllDayTimesCell = true;
+                timeCell.Time = weekCalendarViewModel.AllDay.FirstDateWeek.AddDays(column);
+                timeCell.CSSGridPosition = $"grid-row:1 / span 5; grid-column-start:{column + 2}; height:100px; border-right:1px solid #ccc";
+
+                weekCalendarViewModel.AllDay.TimeCells.Add(timeCell);
+            }
+
             weekCalendarViewModel.TimeSideBar.TimeDivision = new TimeDivision(timeDivision);
 
             return weekCalendarViewModel;
+        }
+        private string GetBackground(DateTime day, DayCalendarViewModel dayCalendarViewModel)
+        {
+            int d = (int)day.DayOfWeek;
+
+            if (d == 6)
+            {
+                return $"background:{dayCalendarViewModel.SaturdayColor}";
+            }
+            else if (d == 0)
+            {
+                return $"background:{dayCalendarViewModel.SundayColor}";
+            }
+
+            return $"background:{dayCalendarViewModel.WeekDaysColor}";
         }
     }
 }

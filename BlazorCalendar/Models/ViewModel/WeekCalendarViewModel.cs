@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using BlazorCalendar.Models.ViewModel.Interfaces;
+using BlazorCalendar.Models.Interfaces;
 
 namespace BlazorCalendar.Models.ViewModel
 {

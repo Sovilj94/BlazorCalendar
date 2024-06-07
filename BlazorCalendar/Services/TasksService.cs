@@ -1,4 +1,6 @@
 ﻿using BlazorCalendar.Models;
+using BlazorCalendar.Models.ViewModel;
+using BlazorCalendar.Styles;
 
 namespace BlazorCalendar.Services
 {
@@ -29,7 +31,7 @@ namespace BlazorCalendar.Services
         }
 
 
-        public List<Tasks> GetTasksForWeekViewModel(DateTime FirstDate, DateTime LastDate, List<Tasks> tasks,TimeDivisionEnum timeDivisionEnum)
+        public List<Tasks> GetTasksForWeekViewModel(DateTime FirstDate, DateTime LastDate, List<Tasks> tasks, TimeDivisionEnum timeDivisionEnum)
         {
             var TasksList = tasks.Where(x => x.DateStart.Date >= FirstDate.Date && x.DateStart.Date <= LastDate.Date &&
                                 (x.DateStart.TimeOfDay != TimeSpan.Zero && x.DateEnd.TimeOfDay != TimeSpan.Zero)).ToList();
@@ -94,6 +96,7 @@ namespace BlazorCalendar.Services
             }
             return tasks;
         }
+
 
         public List<Tasks> GetAllDayTaskPositionForDayGrid(List<Tasks> tasks, DateTime firstDateOfWeek)
         {
@@ -165,6 +168,98 @@ namespace BlazorCalendar.Services
             }
 
             return tasksForWeek;
+        }
+
+        public List<GridItemViewModel> GetGridItemsForAllDayComponent(List<Tasks> tasks, DateTime firstDateOfWeek)
+        {
+            HashSet<(int, DateTime)> dayAndNumbers = new HashSet<(int number, DateTime day)>();
+
+            List<GridItemViewModel> gridItems = new List<GridItemViewModel>();
+            int counter = 0;
+
+            for (int i = 2; i <= 8; i++)
+            {
+                dayAndNumbers.Add((i, firstDateOfWeek.AddDays(counter)));
+                counter++;
+            }
+
+            var lastDateOfWeek = firstDateOfWeek.AddDays(6);
+            List<Tasks> tasksForWeek = tasks.Where(task =>
+                                             task.DateStart.TimeOfDay == TimeSpan.Zero &&
+                                             task.DateEnd.TimeOfDay == TimeSpan.Zero &&
+                                             (task.DateStart.Date <= lastDateOfWeek && task.DateEnd.Date >= firstDateOfWeek)
+                                         )
+                                         .OrderBy(task => task.DateStart)
+                                         .ThenBy(task => task.DateEnd)
+                                         .ToList();
+
+            if (tasksForWeek.Count == 0)
+            {
+                return new List<GridItemViewModel>();
+            }
+
+            foreach (var task in tasksForWeek)
+            {
+                var colorHatching = Colors.GetHatching(task.FillStyle, task.Color);
+                GridItemViewModel gridItem = new GridItemViewModel
+                {
+                    Task = task,
+                    GridItemColor = $"{colorHatching} color:{task.ForeColor}",
+                    TaskColor = $"{colorHatching} color:{task.ForeColor}",
+                    ClassPin = string.IsNullOrWhiteSpace(task.Comment) ? null : " pin",
+                    ClassPointer = " cursor-pointer",
+                };
+                
+                if (task.DateStart.Date < firstDateOfWeek)
+                {
+                    task.ColumnStart = dayAndNumbers.First(x => x.Item2.Date == firstDateOfWeek).Item1;
+                    gridItem.ColumnStart = dayAndNumbers.First(x => x.Item2.Date == firstDateOfWeek).Item1;
+
+                }
+                else
+                {
+                    task.ColumnStart = dayAndNumbers.First(x => x.Item2.Date == task.DateStart.Date).Item1;
+                    gridItem.ColumnStart = dayAndNumbers.First(x => x.Item2.Date == task.DateStart.Date).Item1;
+                }
+                if (task.DateEnd.Date > lastDateOfWeek)
+                {
+                    task.ColumnEnd = dayAndNumbers.First(x => x.Item2.Date == lastDateOfWeek).Item1 + 1;
+                    gridItem.ColumnEnd = dayAndNumbers.First(x => x.Item2.Date == lastDateOfWeek).Item1 + 1;
+                }
+                else
+                {
+                    task.ColumnEnd = dayAndNumbers.First(x => x.Item2.Date == task.DateEnd.Date).Item1 + 1;
+                    gridItem.ColumnEnd = dayAndNumbers.First(x => x.Item2.Date == task.DateEnd.Date).Item1 + 1;
+                }
+                gridItems.Add(gridItem);
+            }
+
+
+            if(gridItems.Count > 1)
+            {
+                for (int i = 1; i < gridItems.Count; i++)
+                {
+                    gridItems[0].RowStart = 1;
+                    gridItems[0].CSSGridPosition = $"grid-row-start:{gridItems[0].RowStart} ;grid-column:{gridItems[0].ColumnStart} / span {gridItems[0].ColumnEnd - gridItems[0].ColumnStart} ;";
+
+                    if (gridItems[i].ColumnStart < gridItems[0].ColumnEnd)
+                    {
+                        gridItems[i].RowStart = gridItems[i - 1].RowStart + 1;
+                    }
+                    else
+                    {
+                        gridItems[i].RowStart = 1;
+                    }
+                    gridItems[i].CSSGridPosition = $"grid-row-start:{gridItems[i].RowStart} ;grid-column:{gridItems[i].ColumnStart} / span {gridItems[i].ColumnEnd - gridItems[i].ColumnStart} ;";
+                }
+            }
+            else
+            {
+                gridItems[0].RowStart = 1;
+                gridItems[0].CSSGridPosition = $"grid-row-start:{gridItems[0].RowStart} ;grid-column:{gridItems[0].ColumnStart} / span {gridItems[0].ColumnEnd - gridItems[0].ColumnStart} ;";
+            }
+
+            return gridItems;
         }
     }
 }

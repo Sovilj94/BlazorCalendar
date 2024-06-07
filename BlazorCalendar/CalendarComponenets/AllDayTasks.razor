@@ -6,20 +6,17 @@
 
 <div class="all-day-grid">
     <div class="title" style="grid-row-start: 1; grid-column-start: 1; font-size:small">All day</div>
-    @for (int column = 0; column < 7; column++)
+    @foreach (var timeCellViewModel in AllDay.TimeCells)
     {
-        AllDay.TimeCell = new TimeCellViewModel();
-        AllDay.TimeCell.IsAllDayTimesCell = true;
-        AllDay.TimeCell.Time = AllDay.FirstDateWeek.AddDays(column);
-        AllDay.TimeCell.CSSGridPosition = $"grid-row:1 / span 5; grid-column-start:{column + 2}; height:100px; border-right:1px solid #ccc";
         <TimeCell DayClick="DayClick"
-                    Draggable="Draggable"
-                    DropTask="DropTask"
-                    DropTaskAllDay="DropTaskAllDay"
-                    TimeCellViewModel="AllDay.TimeCell">
+                  Draggable="Draggable"
+                  DropTask="DropTask"
+                  DropTaskAllDay="DropTaskAllDay"
+                  TimeCellViewModel="timeCellViewModel">
         </TimeCell>
     }
-    @if (AllDay.Tasks is not null && AllDay.Tasks.Count > 0)
+
+@*     @if (AllDay.Tasks is not null && AllDay.Tasks.Count > 0)
     {
         for (var k = 0; k < AllDay.Tasks.Count; k++)
         {
@@ -41,11 +38,23 @@
                 AllDay.GridItem.CSSGridPosition = CSSGridPosition;
 
                 <GridItem GridItemViewModel="AllDay.GridItem"
-                            Draggable="Draggable"
-                            DragStart="DragStart"
-                            TaskClick="TaskClick">
+                          Draggable="Draggable"
+                          DragStart="DragStart"
+                          TaskClick="TaskClick">
                 </GridItem>
             }
+        }
+    } *@
+
+    @if(AllDay.GridItems is not null && AllDay.GridItems.Count != 0)
+    {
+        @foreach(var item in AllDay.GridItems)
+        {
+            <GridItem GridItemViewModel="item"
+                      Draggable="Draggable"
+                      DragStart="DragStart"
+                      TaskClick="TaskClick">
+            </GridItem>
         }
     }
 </div>

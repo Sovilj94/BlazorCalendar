@@ -7,22 +7,15 @@
 
 <div class="dayGrid">
 
-    @for (int dayTime = 0; dayTime < DayCalendarViewModel.TimeDivision.NumberOfCells; dayTime++)
+    @foreach(var item in DayCalendarViewModel.TimeCells)
     {
-        DateTime time = DayCalendarViewModel.Day.AddMinutes(dayTime * DayCalendarViewModel.TimeDivision.Minutes);
-        int row = dayTime + 1;
-
-        DayCalendarViewModel.TimeCell = new TimeCellViewModel();
-        DayCalendarViewModel.TimeCell.CSSGridPosition = $"grid-row:{row}; grid-column:1 / span {DayCalendarViewModel.MaxNumberOfColumns};";
-        DayCalendarViewModel.TimeCell.Time = time;
-        DayCalendarViewModel.TimeCell.CSSbackground = GetBackground(DayCalendarViewModel.Day);
-
-        <TimeCell DayClick="DayClick"
+            <TimeCell DayClick="DayClick"
                     Draggable="Draggable"
                     DropTask="DropTask"
-                  TimeCellViewModel="DayCalendarViewModel.TimeCell">
-        </TimeCell>
+                  TimeCellViewModel="item">
+            </TimeCell>
     }
+    
 
     @if (DayCalendarViewModel.DayTasks is not null && DayCalendarViewModel.DayTasks.Count != 0)
     {
@@ -61,7 +54,6 @@
         }
     }
 </div>
-
 
 @code {
 

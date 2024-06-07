@@ -1,6 +1,4 @@
-﻿
-using BlazorCalendar.Models.ViewModel.Interfaces;
-using System.Reflection.Metadata.Ecma335;
+﻿using BlazorCalendar.Models.Interfaces;
 
 namespace BlazorCalendar.Models.ViewModel
 {
@@ -8,7 +6,9 @@ namespace BlazorCalendar.Models.ViewModel
     {
         public GridItemViewModel GridItem { get; set; }
 
-        public TimeCellViewModel TimeCell { get; set; } 
+        public List<GridItemViewModel> GRIDITEMs2 { get; set; }
+
+        public List<TimeCellViewModel> TimeCells { get; set; }
 
         public TimeDivision TimeDivision { get; set; }
 

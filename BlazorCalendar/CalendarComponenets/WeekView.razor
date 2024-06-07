@@ -1,7 +1,7 @@
 ﻿@using System.Globalization
 @using BlazorCalendar.Models
 @using BlazorCalendar.Models.ViewModel
-@using BlazorCalendar.Models.ViewModel.Interfaces
+@using BlazorCalendar.Models.Interfaces
 @using BlazorCalendar.Services
 @using BlazorCalendar.Styles
 
@@ -124,7 +124,7 @@
             droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
             droppedTask.DateStart = dragDropParameter.Day;
 
-            WeekCalendarViewModel.AllDay.Tasks = TasksService.GetAllDayTaskPositionForDayGrid(WeekCalendarViewModel.AllDay.Tasks, WeekCalendarViewModel.AllDay.FirstDateWeek);
+            WeekCalendarViewModel.AllDay.GridItems = TasksService.GetGridItemsForAllDayComponent(WeekCalendarViewModel.AllDay.Tasks, WeekCalendarViewModel.AllDay.FirstDateWeek);
         }
 
     }

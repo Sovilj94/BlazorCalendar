@@ -1,4 +1,4 @@
-using BlazorCalendar.Models.ViewModel.Interfaces;
+using BlazorCalendar.Models.Interfaces;
 using BlazorCalendar.Services;
 using BlazorWebAssembly;
 using Microsoft.AspNetCore.Components.Web;

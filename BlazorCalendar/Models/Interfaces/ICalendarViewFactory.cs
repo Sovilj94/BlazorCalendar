@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BlazorCalendar.Models.ViewModel.Interfaces
+namespace BlazorCalendar.Models.Interfaces
 {
     public interface ICalendarViewFactory
     {
