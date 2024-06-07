@@ -1,8 +1,8 @@
 ﻿<div class="d-flex flex-row mb-2">
     <button type="button" @onclick="GoToday" class="btn">📅 Go Today</button>
-    <button type="button" @onclick="@(m => ClicMonthNavigate.InvokeAsync(-SkipMonth()))" class="btn">🔼</button>
-    <button type="button" @onclick="@(m => ClicMonthNavigate.InvokeAsync(SkipMonth()))" class="btn me-2">🔽</button>
-    <input type="date" class="me-2" value="@(FirstDate.ToString("yyyy-MM-dd"))" @onchange="@(e => ChangeFirstDate(e.Value.ToString()))" />
+    <button type="button" @onclick="@(async () => await Navigate(-SkipMonth()))" class="btn">🔼</button>
+    <button type="button" @onclick="@(async () => await Navigate(SkipMonth()))" class="btn me-2">🔽</button>
+    <input type="date" class="me-2" value="@(FirstDate.ToString("yyyy-MM-dd"))" @onchange="@(async e => await ChangeFirstDate(e.Value.ToString()))" />
 
     <select @onchange="TimeDivisionChanged" class="me-2">
         <option value="@TimeDivisionEnum.TwoHours">Two Hours</option>
@@ -47,11 +47,18 @@
         return FirstDateCallBack.InvokeAsync(date);
     }
 
+    private async Task Navigate(int daysToAdd)
+    {
+        FirstDate = FirstDate.AddDays(daysToAdd);
+        await ClicMonthNavigate.InvokeAsync(daysToAdd);
+        await FirstDateCallBack.InvokeAsync(FirstDate.ToString("yyyy-MM-dd"));
+    }
+
     private int SkipMonth()
     {
         return SelectedViewType switch
         {
-            DisplayedView.Monthly => 1,
+            DisplayedView.Monthly => 30,
             DisplayedView.Weekly => 7,
             _ => 0
         };

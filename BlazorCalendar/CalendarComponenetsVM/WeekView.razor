@@ -53,6 +53,11 @@
         WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
     }
 
+    protected override void OnParametersSet()
+    {
+        WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
+    }
+
     private WeekCalendarViewModel WeekCalendarViewModel { get; set; }
 
     [Parameter]
