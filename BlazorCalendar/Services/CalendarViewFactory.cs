@@ -60,6 +60,7 @@ namespace BlazorCalendar.Services
                 TimeCellViewModel timeCell = new TimeCellViewModel();
                 timeCell.IsAllDayTimesCell = true;
                 timeCell.Time = weekCalendarViewModel.AllDay.FirstDateWeek.AddDays(column);
+                timeCell.Column = column + 2;
                 timeCell.CSSGridPosition = $"grid-row:1 / span 5; grid-column-start:{column + 2}; height:100px; border-right:1px solid #ccc";
 
                 weekCalendarViewModel.AllDay.TimeCells.Add(timeCell);
@@ -84,6 +85,7 @@ namespace BlazorCalendar.Services
                     Day = day,
                     TimeDivision = new TimeDivision(timeDivision),
                     DayTasks = _tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks, timeDivision),
+                    GridItems = _tasksService.GetGridItemsForDayComponent(_tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks, timeDivision), new TimeDivision(timeDivision).Minutes),
                     TimeCells = new List<TimeCellViewModel>()
                 };
 
@@ -103,8 +105,9 @@ namespace BlazorCalendar.Services
 
                     TimeCellViewModel timeCell = new TimeCellViewModel();
 
-                    timeCell = new TimeCellViewModel();
-                    timeCell.CSSGridPosition = $"grid-row:{row}; grid-column:1 / span {dayCalendar.MaxNumberOfColumns};";
+                    timeCell.Row = row;
+                    timeCell.ColumnsSpan = dayCalendar.MaxNumberOfColumns;
+                    timeCell.CSSGridPosition = $"grid-row:{timeCell.Row}; grid-column:1 / span {timeCell.ColumnsSpan};";
                     timeCell.Time = time;
                     timeCell.CSSbackground = GetBackground(dayCalendar.Day, dayCalendar);
 

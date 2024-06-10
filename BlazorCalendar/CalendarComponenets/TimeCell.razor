@@ -9,7 +9,7 @@
      @ondrop:preventDefault="true"
      @ondrop="() => HandleDayOnDrop(TimeCellViewModel.Time)"
      @onclick="e => ClickDayInternal(e, TimeCellViewModel.Time)"
-     style="@TimeCellViewModel.CSSbackground; @TimeCellViewModel.CSSGridPosition ">
+     style="@TimeCellViewModel.CSSbackground; @CssGriPosition()">
 </div>
 
 @code {
@@ -63,5 +63,17 @@
             };
 
         await DayClick.InvokeAsync(clickEmptyDayParameter);
+    }
+
+    private string CssGriPosition()
+    {
+        if (TimeCellViewModel.IsAllDayTimesCell)
+        {
+            return $"grid-row:1 / span 5; grid-column-start:{TimeCellViewModel.Column}; height:100px; border-right:1px solid #ccc";
+        }
+        else
+        {
+            return $"grid-row:{TimeCellViewModel.Row}; grid-column:1 / span {TimeCellViewModel.ColumnsSpan};";
+        }
     }
 }

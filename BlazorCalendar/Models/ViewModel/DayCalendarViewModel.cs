@@ -4,15 +4,11 @@ namespace BlazorCalendar.Models.ViewModel
 {
     public class DayCalendarViewModel : ICalendarView
     {
-        public GridItemViewModel GridItem { get; set; }
-
-        public List<GridItemViewModel> GRIDITEMs2 { get; set; }
+        public List<GridItemViewModel>? GridItems { get; set; }
 
         public List<TimeCellViewModel> TimeCells { get; set; }
 
         public TimeDivision TimeDivision { get; set; }
-
-        public List<Tasks>? DayTasks { get; set; }
 
         public DateTime Day { get; set; }
 

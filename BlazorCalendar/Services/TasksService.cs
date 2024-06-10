@@ -35,16 +35,12 @@ namespace BlazorCalendar.Services
             var TasksList = tasks.Where(x => x.DateStart.Date >= FirstDate.Date && x.DateStart.Date <= LastDate.Date &&
                                 (x.DateStart.TimeOfDay != TimeSpan.Zero && x.DateEnd.TimeOfDay != TimeSpan.Zero)).ToList();
 
-            TasksList = GetTaskPositionForDayGrid(TasksList, new TimeDivision(timeDivisionEnum).Minutes);
-
             return TasksList;
         }
 
         public List<Tasks> GetTasksForDayViewModel(DateTime day, List<Tasks> tasks, TimeDivisionEnum timeDivisionEnum)
         {
-            var TasksList = tasks.Where(x => (x.DateStart.Date == day.Date || x.DateEnd.Date == day.Date) && x.DateStart.TimeOfDay != TimeSpan.Zero || x.DateEnd.TimeOfDay != TimeSpan.Zero).ToList();
-
-            TasksList = GetTaskPositionForDayGrid(TasksList, new TimeDivision(timeDivisionEnum).Minutes);
+            var TasksList = tasks.Where(x => x.DateStart.Date == day.Date || x.DateEnd.Date == day.Date).ToList();
 
             return TasksList;
         }
@@ -95,7 +91,6 @@ namespace BlazorCalendar.Services
             }
             return tasks;
         }
-
 
         public List<Tasks> GetAllDayTaskPositionForDayGrid(List<Tasks> tasks, DateTime firstDateOfWeek)
         {
@@ -167,6 +162,81 @@ namespace BlazorCalendar.Services
             }
 
             return tasksForWeek;
+        }
+
+        public List<GridItemViewModel> GetGridItemsForDayComponent(List<Tasks> tasks, int minutes)
+        {
+            List<GridItemViewModel> gridItems = new List<GridItemViewModel>();
+
+            tasks = tasks.Where(x => x.DateStart.TimeOfDay != TimeSpan.Zero || x.DateEnd.TimeOfDay != TimeSpan.Zero)
+                         .OrderBy(x => x.DateStart)
+                         .ThenBy(x => x.DateEnd)
+                         .ToList();
+
+            for (int i = 0; i < tasks.Count; i++)
+            {
+                GridItemViewModel gridItem = new GridItemViewModel();
+                Tasks currentTask = tasks[i];
+                gridItem.Task = currentTask;
+
+                gridItem.TaskColor = Colors.GetHatching(currentTask.FillStyle, currentTask.Color);
+                gridItem.TaskColor = $"{gridItem.TaskColor};color:{currentTask.ForeColor}";
+
+                gridItem.ClassPin = string.IsNullOrWhiteSpace(currentTask.Comment) ? null : " pin";
+                gridItem.ClassPointer = " cursor-pointer";
+
+                DateTime taskStartHour = currentTask.DateStart;
+                DateTime taskEndHour = currentTask.DateEnd;
+
+                TimeSpan duration = taskEndHour - taskStartHour;
+                int rowSpan = (int)Math.Ceiling(duration.TotalMinutes / minutes);
+
+                int startRowIndex = (int)((taskStartHour.TimeOfDay.TotalMinutes) / minutes) + 1;
+
+                gridItem.RowStart = startRowIndex;
+                gridItem.RowEnd = startRowIndex + rowSpan;
+                gridItem.Day = currentTask.DateStart;
+
+                gridItems.Add(gridItem);
+            }
+
+            var gridItemsGroupedByDate = gridItems
+               .GroupBy(t => t.Day.Date)
+               .ToList();
+
+            foreach (var group in gridItemsGroupedByDate)
+            {
+                var gridItemsInDay = group.OrderBy(t => t.RowStart).ThenBy(t => t.RowEnd).ToList();
+
+                for (int i = 0; i < gridItemsInDay.Count; i++)
+                {
+                    var currentGridItem = gridItemsInDay[i];
+                    currentGridItem.ColumnStart = 1;
+
+                    for (int j = 0; j < i; j++)
+                    {
+                        var previousGridItem = gridItemsInDay[j];
+
+                        // Check for overlap
+                        if (currentGridItem.RowStart < previousGridItem.RowEnd && currentGridItem.RowEnd > previousGridItem.RowStart)
+                        {
+                            currentGridItem.ColumnStart = Math.Max(currentGridItem.ColumnStart, previousGridItem.ColumnStart + 1);
+                        }
+                    }
+                }
+            }
+
+            foreach (var grItem in gridItems)
+            {
+                string gridRow = $"grid-row: {grItem.RowStart} / span {grItem.RowEnd - grItem.RowStart};";
+                string gridColumn = $"grid-column-start: {grItem.ColumnStart};";
+
+                string CSSGridPoition = $"{gridRow} {gridColumn}";
+
+                grItem.CSSGridPosition = CSSGridPoition;
+            }
+
+            return gridItems;
         }
 
         public List<GridItemViewModel> GetGridItemsForAllDayComponent(List<Tasks> tasks, DateTime firstDateOfWeek)
