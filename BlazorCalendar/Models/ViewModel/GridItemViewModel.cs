@@ -7,13 +7,13 @@ namespace BlazorCalendar.Models.ViewModel
     {
         public DateTime Day { get; set; }
 
-        public ICalendarEvent Task { get; set; }
+        public ICalendarEvent Event { get; set; }
 
         public string CSSGridPosition { get; set; }
 
         public string GridItemColor { get; set; }
 
-        public string TaskColor { get; set; }
+        public string EventColor { get; set; }
 
         public string ClassPin { get; set; }
 

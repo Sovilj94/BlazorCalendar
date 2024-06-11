@@ -48,11 +48,11 @@ namespace BlazorCalendar.Services
             weekCalendarViewModel.Tasks = _tasksService.GetTasksForWeekViewModel(firstDateWeek, lastDateOfWeek, _tasksService.GetAllTasks(), timeDivision);
 
             // Popunjavanje AllDayViewModela
-            weekCalendarViewModel.AllDay.Tasks = _tasksService.GetAllDayTaskPositionForDayGrid(_tasksService.GetAllTasks(), firstDateWeek);
+            weekCalendarViewModel.AllDay.Events = _tasksService.GetTasksForAllDayViewModel((List<ICalendarEvent>)_tasksService.GetAllTasks());
             weekCalendarViewModel.AllDay.FirstDateWeek = firstDateWeek;
             weekCalendarViewModel.AllDay.TimeCells = new List<TimeCellViewModel>();
             weekCalendarViewModel.AllDay.GridItems = new List<GridItemViewModel>();
-            weekCalendarViewModel.AllDay.GridItems = _tasksService.GetGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Tasks, firstDateWeek);
+            weekCalendarViewModel.AllDay.GridItems = _tasksService.GetGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Events, firstDateWeek);
 
             // TimeCells
             for (int column = 0; column < 7; column++)
@@ -84,14 +84,13 @@ namespace BlazorCalendar.Services
                 {
                     Day = day,
                     TimeDivision = new TimeDivision(timeDivision),
-                    DayTasks = _tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks, timeDivision),
                     GridItems = _tasksService.GetGridItemsForDayComponent(_tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks, timeDivision), new TimeDivision(timeDivision).Minutes),
                     TimeCells = new List<TimeCellViewModel>()
                 };
 
-                if (dayCalendar.DayTasks != null && dayCalendar.DayTasks.Count != 0)
+                if (dayCalendar.GridItems != null && dayCalendar.GridItems.Count != 0)
                 {
-                    dayCalendar.MaxNumberOfColumns = dayCalendar.DayTasks.Max(x => x.ColumnStart);
+                    dayCalendar.MaxNumberOfColumns = dayCalendar.GridItems.Max(x => x.ColumnStart);
                 }
                 else
                 {

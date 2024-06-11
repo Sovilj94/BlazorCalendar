@@ -141,7 +141,7 @@ namespace BlazorCalendar
 
                 if (i == 0)
                 {
-                    currentTask.ColumnStart = 2;
+                    //currentTask.ColumnStart = 2;
                 }
 
                 // Iterate over the remaining tasks to compare with the current task
@@ -149,7 +149,7 @@ namespace BlazorCalendar
                 {
                     Tasks nextTask = tasksForDate[j];
                         
-                    nextTask.ColumnStart = currentTask.ColumnStart + 1;
+                    //nextTask.ColumnStart = currentTask.ColumnStart + 1;
                 }
             }
 

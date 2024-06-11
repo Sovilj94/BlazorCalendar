@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BlazorCalendar.Models.Interfaces;
+﻿using BlazorCalendar.Models.Interfaces;
 
 namespace BlazorCalendar.Models.ViewModel
 {
@@ -14,6 +12,6 @@ namespace BlazorCalendar.Models.ViewModel
 
         public TimeSideBarViewModel TimeSideBar { get; set; }
 
-        public List<Tasks> Tasks { get; set; }
+        public List<ICalendarEvent> Tasks { get; set; }
     }
 }

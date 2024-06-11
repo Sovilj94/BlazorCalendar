@@ -20,10 +20,10 @@
     public bool Draggable { get; set; }
 
     [Parameter]
-    public EventCallback<DragDropParameter> DropTask { get; set; }
+    public EventCallback<DragDropParameter> DropEventOnDay { get; set; }
 
     [Parameter]
-    public EventCallback<DragDropParameter> DropTaskAllDay { get; set; }
+    public EventCallback<DragDropParameter> DropEventOnAllDay { get; set; }
 
     [Parameter]
     public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
@@ -45,9 +45,9 @@
             };
 
         if (TimeCellViewModel.IsAllDayTimesCell)
-            await DropTaskAllDay.InvokeAsync(dragDropParameter);
+            await DropEventOnAllDay.InvokeAsync(dragDropParameter);
         else
-            await DropTask.InvokeAsync(dragDropParameter);
+            await DropEventOnDay.InvokeAsync(dragDropParameter);
     }
 
     private async Task ClickDayInternal(MouseEventArgs e, DateTime day)

@@ -18,9 +18,5 @@ public sealed class Tasks : ICalendarEvent
     public DateTime DateEnd { get; set; }
     public bool NotBeDraggable { get; set; }
 	public int Type { get; set; }
-    public int ColumnStart { get; set; }
-    public int ColumnEnd { get; set; }
-    public int RowStart { get; set; }
-    public int RowEnd { get; set; } 
 
 }

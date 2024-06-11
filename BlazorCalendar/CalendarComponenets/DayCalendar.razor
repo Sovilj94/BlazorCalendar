@@ -11,7 +11,7 @@
     {
         <TimeCell DayClick="DayClick"
                   Draggable="Draggable"
-                  DropTask="DropTask"
+                  DropEventOnDay="DropEventOnDay"
                   TimeCellViewModel="timeCellViewModel">
         </TimeCell>
     }
@@ -23,7 +23,7 @@
             <GridItem GridItemViewModel="gridItem"
                       Draggable="Draggable"
                       DragStart="DragStart"
-                      TaskClick="TaskClick">
+                      EventClick="EventClick">
             </GridItem>
         }
     }
@@ -43,11 +43,11 @@
     public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
 
     [Parameter]
-    public EventCallback<ClickTaskParameter> TaskClick { get; set; }
+    public EventCallback<ClickTaskParameter> EventClick { get; set; }
 
     [Parameter]
     public EventCallback<DragDropParameter> DragStart { get; set; }
 
     [Parameter]
-    public EventCallback<DragDropParameter> DropTask { get; set; }
+    public EventCallback<DragDropParameter> DropEventOnDay { get; set; }
 }

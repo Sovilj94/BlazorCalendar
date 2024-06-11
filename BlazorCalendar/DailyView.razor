@@ -102,7 +102,7 @@
             int row = quarterHour + 1;
             DateTime quarterHours = day.AddMinutes(quarterHour * minutes);
 
-            int totalColumns = TasksList.Any() ? TasksList.Max(x => x.ColumnStart) : 2;
+            int totalColumns = 1;
 
             <div class="hour day-cellule noselect"
                  ondragover="event.preventDefault();this.style.fontWeight = '600';"
@@ -144,7 +144,7 @@
                                 string gridRow = $"grid-row: {startRowIndex} / span {rowSpan};";
 
                                 <div class="@($"hour-task {classPin}{classPointer} border-start border-top border-bottom")"
-                                     style="@taskColor; grid-column:@task.ColumnStart;@gridRow;"
+                                     style="@taskColor;@gridRow;"
                                      draggable="@Draggable.ToString()"
                                      @ondragstart="() => HandleDragStart(task.ID)"
                                      @onclick="e => ClickTaskInternal(e, task.ID, day)">

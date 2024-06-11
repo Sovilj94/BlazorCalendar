@@ -1,14 +1,15 @@
 ﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.Interfaces
 @using BlazorCalendar.Models.ViewModel
 
 @inject ITaskDraggedService TaskDraggedService
 
 <div class="@($"hour-task {GridItemViewModel.ClassPin}{GridItemViewModel.ClassPointer} border-start border-top border-bottom")"
-     style="@GridItemViewModel.CSSGridPosition @GridItemViewModel.TaskColor"
+     style="@GridItemViewModel.CSSGridPosition @GridItemViewModel.EventColor"
      draggable="@Draggable.ToString()"
-     @ondragstart="(e) => HandleDragStart(GridItemViewModel.Task.ID)"
-     @onclick="e => ClickTaskInternal(e, GridItemViewModel.Task.ID, GridItemViewModel.Day)">
-    @GridItemViewModel.Task.Code
+     @ondragstart="(e) => HandleDragStart(GridItemViewModel.Event.ID)"
+     @onclick="e => ClickEventInternal(e, GridItemViewModel.Event.ID, GridItemViewModel.Day)">
+    @GridItemViewModel.Event.Code
 </div>
 
 @code {
@@ -22,9 +23,7 @@
     public EventCallback<DragDropParameter> DragStart { get; set; }
 
     [Parameter]
-    public EventCallback<ClickTaskParameter> TaskClick { get; set; }
-
-    private Tasks? TaskDragged;
+    public EventCallback<ClickTaskParameter> EventClick { get; set; }
 
     private async Task HandleDragStart(int taskID)
     {
@@ -42,9 +41,9 @@
         await DragStart.InvokeAsync(dragDropParameter);
     }
 
-    private async Task ClickTaskInternal(MouseEventArgs e, int taskID, DateTime day)
+    private async Task ClickEventInternal(MouseEventArgs e, int taskID, DateTime day)
     {
-        if (!TaskClick.HasDelegate)
+        if (!EventClick.HasDelegate)
             return;
 
         List<int> listID = new()
@@ -60,6 +59,6 @@
                 Day = day
             };
 
-        await TaskClick.InvokeAsync(clickTaskParameter);
+        await EventClick.InvokeAsync(clickTaskParameter);
     }
 }

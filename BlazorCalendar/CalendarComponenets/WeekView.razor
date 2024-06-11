@@ -24,9 +24,8 @@
     <AllDayTasks DayClick="DayClick"
                  Draggable="Draggable"
                  DragStart="DragStart"
-                 DropTask="DropTask"
-                 DropTaskAllDay="DropTaskAllDay"
-                 TaskClick="TaskClick"
+                 DropEventOnAllDay="DropEventOnAllDay"
+                 EventClick="EventClick"
                  AllDay="WeekCalendarViewModel.AllDay">
     </AllDayTasks>
 
@@ -36,8 +35,8 @@
             <DayCalendar DayCalendarViewModel="WeekCalendarViewModel.DayCalendar[i]"
                          Draggable="Draggable"
                          DragStart="DragStart"
-                         DropTask="DropTask"
-                         TaskClick="TaskClick"
+                         DropEventOnDay="DropEventOnDay"
+                         EventClick="EventClick"
                          DayClick="DayClick">
             </DayCalendar>
         </div>
@@ -71,9 +70,9 @@
     [Parameter]
     public bool HighlightToday { get; set; } = false;
 
-    private void TaskClick(ClickTaskParameter clickTaskParameter)
+    private void EventClick(ClickTaskParameter clickTaskParameter)
     {
-        fakeConsole = "ID task(s) :" + string.Join(", ", clickTaskParameter.IDList);
+        fakeConsole = "ID Event(s) :" + string.Join(", ", clickTaskParameter.IDList);
     }
 
     private void DayClick(ClickEmptyDayParameter clickEmptyDayParameter)
@@ -86,16 +85,16 @@
         fakeConsole = $"DragStart event : {dragDropParameter.taskID}";
     }
 
-    private void DropTask(DragDropParameter dragDropParameter)
+    private void DropEventOnDay(DragDropParameter dragDropParameter)
     {
-        fakeConsole = $"DropTask event :{dragDropParameter.Day.ToShortDateString()} {dragDropParameter.taskID}";
+        fakeConsole = $"DropEvent event :{dragDropParameter.Day.ToShortDateString()} {dragDropParameter.taskID}";
 
         var droppedTask = WeekCalendarViewModel.Tasks.FirstOrDefault(t => t.ID == dragDropParameter.taskID);
 
         var DayCalendarDropped = WeekCalendarViewModel.DayCalendar.FirstOrDefault(x => x.Day.Date == dragDropParameter.Day.Date);
         var DayCalendarDragged = WeekCalendarViewModel.DayCalendar.FirstOrDefault(x => x.Day.Date == droppedTask.DateStart.Date);
 
-        var gridItemMoved = DayCalendarDragged.GridItems.Where(x => x.Task.ID == droppedTask.ID).FirstOrDefault();
+        var gridItemMoved = DayCalendarDragged.GridItems.Where(x => x.Event.ID == droppedTask.ID).FirstOrDefault();
 
         DayCalendarDropped.GridItems.Add(gridItemMoved);
         DayCalendarDragged.GridItems.Remove(gridItemMoved);
@@ -118,9 +117,9 @@
         DayCalendarDropped.TimeCells.ForEach(x => x.ColumnsSpan = DayCalendarDropped.MaxNumberOfColumns);
     }
 
-    private void DropTaskAllDay(DragDropParameter dragDropParameter)
+    private void DropEventOnAllDay(DragDropParameter dragDropParameter)
     {
-        var droppedTask = WeekCalendarViewModel.AllDay.Tasks.FirstOrDefault(x => x.ID == dragDropParameter.taskID);
+        var droppedTask = WeekCalendarViewModel.AllDay.Events.FirstOrDefault(x => x.ID == dragDropParameter.taskID);
 
         if (droppedTask != null)
         {
@@ -129,7 +128,7 @@
             droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
             droppedTask.DateStart = dragDropParameter.Day;
 
-            WeekCalendarViewModel.AllDay.GridItems = TasksService.GetGridItemsForAllDayComponent(WeekCalendarViewModel.AllDay.Tasks, WeekCalendarViewModel.AllDay.FirstDateWeek);
+            WeekCalendarViewModel.AllDay.GridItems = TasksService.GetGridItemsForAllDayComponent(WeekCalendarViewModel.AllDay.Events, WeekCalendarViewModel.AllDay.FirstDateWeek);
         }
     }
 }
