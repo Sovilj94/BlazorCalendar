@@ -84,7 +84,7 @@ namespace BlazorCalendar.Services
                 {
                     Day = day,
                     TimeDivision = new TimeDivision(timeDivision),
-                    GridItems = _tasksService.GetGridItemsForDayComponent(_tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks, timeDivision), new TimeDivision(timeDivision).Minutes),
+                    GridItems = _tasksService.GetGridItemsForDayComponent(_tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks, timeDivision), new TimeDivision(timeDivision).Minutes,day),
                     TimeCells = new List<TimeCellViewModel>()
                 };
 

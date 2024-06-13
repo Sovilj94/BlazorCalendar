@@ -96,25 +96,20 @@
 
         var gridItemMoved = DayCalendarDragged.GridItems.Where(x => x.Event.ID == droppedTask.ID).FirstOrDefault();
 
-        DayCalendarDropped.GridItems.Add(gridItemMoved);
-        DayCalendarDragged.GridItems.Remove(gridItemMoved);
-
         var TotalDay = (droppedTask.DateEnd - droppedTask.DateStart).TotalDays;
 
         droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
         droppedTask.DateStart = dragDropParameter.Day;
 
-        WeekCalendarViewModel.DayCalendar.ForEach(x => x.GridItems = TasksService.GetGridItemsForDayComponent(TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks, TimeDivisionEnum), new TimeDivision(TimeDivisionEnum).Minutes));
+        WeekCalendarViewModel.DayCalendar.ForEach(x => 
+        {
+            x.GridItems = TasksService.GetGridItemsForDayComponent(TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks, TimeDivisionEnum), new TimeDivision(TimeDivisionEnum).Minutes, x.Day);
 
-        if (DayCalendarDropped.GridItems.Count != 0)
-            DayCalendarDropped.MaxNumberOfColumns = DayCalendarDropped.GridItems.Max(x => x.ColumnStart);
+            if(x.GridItems != null && x.GridItems.Count != 0)
+            x.MaxNumberOfColumns = x.GridItems.Max(z => z.ColumnStart);
 
-        if (DayCalendarDragged.GridItems.Count != 0)
-            DayCalendarDragged.MaxNumberOfColumns = DayCalendarDragged.GridItems.Max(x => x.ColumnStart);
-
-        // da dobijem duzinu TimeCell-a u zavisnosti koliko ima taskova
-        DayCalendarDragged.TimeCells.ForEach(x => x.ColumnsSpan = DayCalendarDragged.MaxNumberOfColumns);
-        DayCalendarDropped.TimeCells.ForEach(x => x.ColumnsSpan = DayCalendarDropped.MaxNumberOfColumns);
+            x.TimeCells.ForEach(y => y.ColumnsSpan = x.MaxNumberOfColumns);
+        });
     }
 
     private void DropEventOnAllDay(DragDropParameter dragDropParameter)

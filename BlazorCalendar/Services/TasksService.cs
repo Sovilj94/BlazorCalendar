@@ -2,7 +2,6 @@
 using BlazorCalendar.Models.Interfaces;
 using BlazorCalendar.Models.ViewModel;
 using BlazorCalendar.Styles;
-using System.Threading.Tasks;
 
 namespace BlazorCalendar.Services
 {
@@ -14,7 +13,7 @@ namespace BlazorCalendar.Services
             var TasksList = new List<ICalendarEvent>()
             {
                  new Tasks { ID = 0, DateStart = today.AddHours(11), DateEnd = today.AddHours(16), Code = "HELLO", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
-                 new Tasks { ID = 10, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "HELLO", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
+                 new Tasks { ID = 10, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "HELLO2", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
                  new Tasks { ID = 11, DateStart = today.AddDays(5), DateEnd = today.AddDays(7), Code = "Woha", Color = "#FFD801", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
                  new Tasks { ID = 1, DateStart = today.AddDays(2).AddHours(5), DateEnd = today.AddDays(2).AddHours(11), Code = "😉 CP", Color = "#19C319", Caption = "Lorem ipsum dolor sit amet" } ,
                  new Tasks { ID = 2, DateStart = today.AddDays(-2).AddHours(8), DateEnd = today.AddDays(-2).AddHours(20), Code = "POD", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
@@ -30,7 +29,6 @@ namespace BlazorCalendar.Services
 
             return TasksList;
         }
-
 
         public List<ICalendarEvent> GetTasksForWeekViewModel(DateTime FirstDate, DateTime LastDate, List<ICalendarEvent> tasks, TimeDivisionEnum timeDivisionEnum)
         {
@@ -54,79 +52,111 @@ namespace BlazorCalendar.Services
             return EventList;
         }
 
-        public List<GridItemViewModel> GetGridItemsForDayComponent(List<ICalendarEvent> events, int minutes)
+        public List<GridItemViewModel> GetGridItemsForDayComponent(List<ICalendarEvent> events, int minutes, DateTime day)
         {
-            List<GridItemViewModel> gridItems = new List<GridItemViewModel>();
+            try
+            {
+                List<GridItemViewModel> gridItems = new List<GridItemViewModel>();
 
             events = events.Where(x => x.DateStart.TimeOfDay != TimeSpan.Zero || x.DateEnd.TimeOfDay != TimeSpan.Zero)
-                         .OrderBy(x => x.DateStart)
-                         .ThenBy(x => x.DateEnd)
-                         .ToList();
+                           .OrderBy(x => x.DateStart)
+                           .ThenBy(x => x.DateEnd)
+                           .ToList();
 
-            for (int i = 0; i < events.Count; i++)
+            foreach (var currentEvent in events)
             {
-                GridItemViewModel gridItem = new GridItemViewModel();
-                ICalendarEvent currentEvent = events[i];
-                gridItem.Event = currentEvent;
-
-                gridItem.EventColor = Colors.GetHatching(currentEvent.FillStyle, currentEvent.Color);
-                gridItem.EventColor = $"{gridItem.EventColor};color:{currentEvent.ForeColor}";
-
-                gridItem.ClassPin = string.IsNullOrWhiteSpace(currentEvent.Comment) ? null : " pin";
-                gridItem.ClassPointer = " cursor-pointer";
-
-                DateTime taskStartHour = currentEvent.DateStart;
-                DateTime taskEndHour = currentEvent.DateEnd;
-
-                TimeSpan duration = taskEndHour - taskStartHour;
-                int rowSpan = (int)Math.Ceiling(duration.TotalMinutes / minutes);
-
-                int startRowIndex = (int)((taskStartHour.TimeOfDay.TotalMinutes) / minutes) + 1;
-
-                gridItem.RowStart = startRowIndex;
-                gridItem.RowEnd = startRowIndex + rowSpan;
-                gridItem.Day = currentEvent.DateStart;
-
-                gridItems.Add(gridItem);
-            }
-
-            var gridItemsGroupedByDate = gridItems
-               .GroupBy(t => t.Day.Date)
-               .ToList();
-
-            foreach (var group in gridItemsGroupedByDate)
-            {
-                var gridItemsInDay = group.OrderBy(t => t.RowStart).ThenBy(t => t.RowEnd).ToList();
-
-                for (int i = 0; i < gridItemsInDay.Count; i++)
+                if (currentEvent.DateStart.Date <= day.Date && currentEvent.DateEnd.Date >= day.Date)
                 {
-                    var currentGridItem = gridItemsInDay[i];
-                    currentGridItem.ColumnStart = 1;
-
-                    for (int j = 0; j < i; j++)
+                    GridItemViewModel gridItem = new GridItemViewModel
                     {
-                        var previousGridItem = gridItemsInDay[j];
+                        Event = currentEvent,
+                        EventColor = $"{Colors.GetHatching(currentEvent.FillStyle, currentEvent.Color)};color:{currentEvent.ForeColor}",
+                        ClassPin = string.IsNullOrWhiteSpace(currentEvent.Comment) ? null : " pin",
+                        ClassPointer = " cursor-pointer",
+                        Day = day
+                    };
 
-                        // Check for overlap
-                        if (currentGridItem.RowStart < previousGridItem.RowEnd && currentGridItem.RowEnd > previousGridItem.RowStart)
-                        {
-                            currentGridItem.ColumnStart = Math.Max(currentGridItem.ColumnStart, previousGridItem.ColumnStart + 1);
-                        }
+                    DateTime taskStartHour, taskEndHour;
+                    if (currentEvent.DateStart.Date == day.Date && currentEvent.DateEnd.Date > day.Date)
+                    {
+                        // Event starts today but ends on a future date
+                        taskStartHour = currentEvent.DateStart;
+                        taskEndHour = day.AddDays(1).Date;
                     }
+                    else if (currentEvent.DateStart.Date < day.Date && currentEvent.DateEnd.Date == day.Date)
+                    {
+                        // Event started in the past but ends today
+                        taskStartHour = day.Date;
+                        taskEndHour = currentEvent.DateEnd;
+                    }
+                    else if (currentEvent.DateStart.Date < day.Date && currentEvent.DateEnd.Date > day.Date)
+                    {
+                        // Event spans across the whole day
+                        taskStartHour = day.Date;
+                        taskEndHour = day.AddDays(1).Date;
+                    }
+                    else
+                    {
+                        // Event starts and ends today
+                        taskStartHour = currentEvent.DateStart;
+                        taskEndHour = currentEvent.DateEnd;
+                    }
+
+                    TimeSpan duration = taskEndHour - taskStartHour;
+                    int rowSpan = (int)Math.Ceiling(duration.TotalMinutes / minutes);
+                    int startRowIndex = (int)(taskStartHour.TimeOfDay.TotalMinutes / minutes) + 1;
+
+                    gridItem.RowStart = startRowIndex;
+                    gridItem.RowEnd = startRowIndex + rowSpan;
+
+                    gridItems.Add(gridItem);
+
+                    // naci srecnije rijesenje 
+                    if (currentEvent.DateEnd.TimeOfDay == TimeSpan.Zero && currentEvent.DateEnd.Date == day.Date && currentEvent.DateStart.Date < day.Date)
+                        gridItems.Remove(gridItem);
                 }
             }
 
-            foreach (var grItem in gridItems)
-            {
-                string gridRow = $"grid-row: {grItem.RowStart} / span {grItem.RowEnd - grItem.RowStart};";
-                string gridColumn = $"grid-column-start: {grItem.ColumnStart};";
+           
+                var gridItemsGroupedByDate = gridItems.GroupBy(t => t.Day.Date).ToList();
 
-                string CSSGridPoition = $"{gridRow} {gridColumn}";
+                foreach (var group in gridItemsGroupedByDate)
+                {
+                    var gridItemsInDay = group.OrderBy(t => t.RowStart).ThenBy(t => t.RowEnd).ToList();
 
-                grItem.CSSGridPosition = CSSGridPoition;
+                    for (int i = 0; i < gridItemsInDay.Count; i++)
+                    {
+                        var currentGridItem = gridItemsInDay[i];
+                        currentGridItem.ColumnStart = 1;
+
+                        for (int j = 0; j < i; j++)
+                        {
+                            var previousGridItem = gridItemsInDay[j];
+
+                            // Check for overlap
+                            if (currentGridItem.RowStart < previousGridItem.RowEnd && currentGridItem.RowEnd > previousGridItem.RowStart)
+                            {
+                                currentGridItem.ColumnStart = Math.Max(currentGridItem.ColumnStart, previousGridItem.ColumnStart + 1);
+                            }
+                        }
+                    }
+                }
+
+                foreach (var grItem in gridItems)
+                {
+                    string gridRow = $"grid-row: {grItem.RowStart} / span {grItem.RowEnd - grItem.RowStart};";
+                    string gridColumn = $"grid-column-start: {grItem.ColumnStart};";
+                    string CSSGridPosition = $"{gridRow} {gridColumn}";
+                    grItem.CSSGridPosition = CSSGridPosition;
+                }
+
+                return gridItems;
             }
-
-            return gridItems;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error grouping grid items: {ex.Message}");
+                return new List<GridItemViewModel>();
+            }
         }
 
         public List<GridItemViewModel> GetGridItemsForAllDayComponent(List<ICalendarEvent> events, DateTime firstDateOfWeek)
@@ -167,7 +197,7 @@ namespace BlazorCalendar.Services
                     ClassPin = string.IsNullOrWhiteSpace(ev.Comment) ? null : " pin",
                     ClassPointer = " cursor-pointer",
                 };
-                
+
                 if (ev.DateStart.Date < firstDateOfWeek)
                 {
                     gridItem.ColumnStart = dayAndNumbers.First(x => x.Item2.Date == firstDateOfWeek).Item1;
