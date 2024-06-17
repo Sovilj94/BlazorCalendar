@@ -21,24 +21,24 @@
         </div>
     }
 
-    <AllDayTasks DayClick="DayClick"
+    <AllDay DayClick="DayClick"
                  Draggable="Draggable"
                  DragStart="DragStart"
                  DropEventOnAllDay="DropEventOnAllDay"
                  EventClick="EventClick"
-                 AllDay="WeekCalendarViewModel.AllDay">
-    </AllDayTasks>
+                AllDayViewModel="WeekCalendarViewModel.AllDay">
+    </AllDay>
 
     @for (int i = 0; i < WeekCalendarViewModel.DayCalendar.Count; i++)
     {
         <div class="day-column" style="grid-column-start: @(i+2);">
-            <DayCalendar DayCalendarViewModel="WeekCalendarViewModel.DayCalendar[i]"
+            <Day DayViewModel="WeekCalendarViewModel.DayCalendar[i]"
                          Draggable="Draggable"
                          DragStart="DragStart"
                          DropEventOnDay="DropEventOnDay"
                          EventClick="EventClick"
                          DayClick="DayClick">
-            </DayCalendar>
+            </Day>
         </div>
     }
 </div>
@@ -103,7 +103,7 @@
 
         WeekCalendarViewModel.DayCalendar.ForEach(x => 
         {
-            x.GridItems = TasksService.GetGridItemsForDayComponent(TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks, TimeDivisionEnum), new TimeDivision(TimeDivisionEnum).Minutes, x.Day);
+            x.GridItems = TasksService.GetGridItemsForDayComponent(TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks), new TimeDivision(TimeDivisionEnum).Minutes, x.Day);
 
             if(x.GridItems != null && x.GridItems.Count != 0)
             x.MaxNumberOfColumns = x.GridItems.Max(z => z.ColumnStart);

@@ -1,0 +1,8 @@
+﻿.dayGrid {
+    border: 1px solid #c6c6c6;
+    flex: 1;
+    display: grid;
+    justify-content: normal;
+    grid-row-start: 3;
+    width: auto;
+}

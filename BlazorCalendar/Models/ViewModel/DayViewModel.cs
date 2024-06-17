@@ -1,8 +1,7 @@
-﻿using BlazorCalendar.Models.Interfaces;
-
+﻿
 namespace BlazorCalendar.Models.ViewModel
 {
-    public class DayCalendarViewModel : ICalendarView
+    public class DayViewModel
     {
         public List<GridItemViewModel>? GridItems { get; set; }
 

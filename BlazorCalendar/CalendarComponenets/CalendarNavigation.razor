@@ -1,7 +1,7 @@
-﻿<div class="d-flex flex-row mb-2">
+﻿<div class="calendar-nav-bar d-flex flex-row mb-2">
     <button type="button" @onclick="GoToday" class="btn">📅 Go Today</button>
-    <button type="button" @onclick="@(async () => await Navigate(-SkipMonth()))" class="btn">🔼</button>
-    <button type="button" @onclick="@(async () => await Navigate(SkipMonth()))" class="btn me-2">🔽</button>
+    <button type="button" @onclick="@(async () => await Navigate(-SkipDays()))" class="btn">🔼</button>
+    <button type="button" @onclick="@(async () => await Navigate(SkipDays()))" class="btn me-2">🔽</button>
     <input type="date" class="me-2" value="@(FirstDate.ToString("yyyy-MM-dd"))" @onchange="@(async e => await ChangeFirstDate(e.Value.ToString()))" />
 
     <select @onchange="TimeDivisionChanged" class="me-2">
@@ -54,12 +54,13 @@
         await FirstDateCallBack.InvokeAsync(FirstDate.ToString("yyyy-MM-dd"));
     }
 
-    private int SkipMonth()
+    private int SkipDays()
     {
         return SelectedViewType switch
         {
             DisplayedView.Monthly => 30,
             DisplayedView.Weekly => 7,
+            DisplayedView.Daily => 1,
             _ => 0
         };
     }

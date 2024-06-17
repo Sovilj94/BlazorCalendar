@@ -1,9 +1,9 @@
 ﻿@using BlazorCalendar.Models
-@using BlazorCalendar.Models.ViewModel
+@using BlazorCalendar.Models.DayViewModels
 
 @inject ITaskDraggedService TaskDraggedService
 
-<div class="hour day-cellule noselect"
+<div class="dhour day-cellule noselect"
      ondragover="event.preventDefault();this.style.fontWeight = '600';"
      ondragleave="this.style.fontWeight='100';"
      @ondrop:preventDefault="true"
@@ -14,7 +14,7 @@
 
 @code {
     [Parameter]
-    public TimeCellViewModel TimeCellViewModel { get; set; }
+    public DTimeCellViewModel TimeCellViewModel { get; set; }
 
     [Parameter]
     public bool Draggable { get; set; }

@@ -1,30 +1,30 @@
 ﻿@using BlazorCalendar.Models
-@using BlazorCalendar.Models.ViewModel
+@using BlazorCalendar.Models.DayViewModels
 @using BlazorCalendar.Services
 @using BlazorCalendar.Styles
 
 @inject TasksService TasksService
 
-<div class="dayGrid">
+<div class="ddayGrid">
 
-    @foreach (var timeCellViewModel in DayCalendarViewModel.TimeCells)
+    @foreach (var timeCellViewModel in DayViewModel.TimeCellsViewModel)
     {
-        <TimeCell DayClick="DayClick"
+        <DTimeCell DayClick="DayClick"
                   Draggable="Draggable"
                   DropEventOnDay="DropEventOnDay"
                   TimeCellViewModel="timeCellViewModel">
-        </TimeCell>
+        </DTimeCell>
     }
 
-    @if (DayCalendarViewModel.GridItems is not null && DayCalendarViewModel.GridItems.Count != 0)
+    @if (DayViewModel.GridItemsViewModel is not null && DayViewModel.GridItemsViewModel.Count != 0)
     {
-        foreach (var gridItem in DayCalendarViewModel.GridItems)
+        foreach (var gridItem in DayViewModel.GridItemsViewModel)
         {
-            <GridItem GridItemViewModel="gridItem"
+            <DGridItem GridItemViewModel="gridItem"
                       Draggable="Draggable"
                       DragStart="DragStart"
                       EventClick="EventClick">
-            </GridItem>
+            </DGridItem>
         }
     }
 </div>
@@ -34,7 +34,7 @@
     public int MaxNumberOfColumnsInDay { get; set; }
 
     [Parameter]
-    public DayCalendarViewModel DayCalendarViewModel { get; set; }
+    public DDayViewModel DayViewModel { get; set; }
 
     [Parameter]
     public bool Draggable { get; set; }

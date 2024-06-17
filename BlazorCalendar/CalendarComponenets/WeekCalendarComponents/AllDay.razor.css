@@ -1,0 +1,15 @@
+﻿.all-day-grid {
+    display: grid;
+    height: 100px;
+    grid-row-start: 2;
+    grid-column: 1 / span 8;
+    grid-template-rows: repeat(5,20%);
+    grid-template-columns: 50px repeat(7,minmax(auto,170px))
+}
+.title{
+    border: 1px solid #ccc;
+    text-align:center;
+    font-size: 0.8em;
+    padding: 0.5em;
+    grid-row:1 / span 5;
+}

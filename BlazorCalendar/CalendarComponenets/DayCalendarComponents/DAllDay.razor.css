@@ -1,0 +1,14 @@
+﻿.dall-day-grid {
+    display: grid;
+    height: 100px;
+    grid-column-start: 1;
+    grid-row-start: 2;
+    grid-column-start:2;
+    grid-template-rows: repeat(5,20%);
+}
+.title{
+    border: 1px solid #ccc;
+    text-align:center;
+    font-size: 0.8em;
+    padding: 0.5em;
+}

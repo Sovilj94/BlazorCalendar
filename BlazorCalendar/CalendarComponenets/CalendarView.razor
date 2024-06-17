@@ -3,7 +3,8 @@
 @using BlazorCalendar.Models.Interfaces
 @using System.Globalization
 @using BlazorCalendar.Services
-@using BlazorCalendar.CalendarComponenets
+@using BlazorCalendar.CalendarComponenets.WeekCalendarComponents
+@using BlazorCalendar.CalendarComponenets.DayCalendarComponents
 
 @inherits CalendarBase
 
@@ -27,7 +28,10 @@
 }
 else if (SelectedViewType == DisplayedView.Daily)
 {
-    <div>Daily View</div>
+    <DayView Draggable="Draggable"
+             TimeDivisionEnum="TimeDivisionEnum"
+             CalendarViewModel="CalendarViewModel">
+    </DayView>
 }
 
 @code {

@@ -8,7 +8,7 @@ namespace BlazorCalendar.Models.ViewModel
 
         public AllDayViewModel AllDay { get; set; }
 
-        public List<DayCalendarViewModel> DayCalendar { get; set; }
+        public List<DayViewModel> DayCalendar { get; set; }
 
         public TimeSideBarViewModel TimeSideBar { get; set; }
 

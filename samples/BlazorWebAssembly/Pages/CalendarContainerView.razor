@@ -9,7 +9,7 @@
 
 @inject TasksService TasksService
 
-<div class="d-flex flex-row mb-2">
+<div class="calendar-nav-bar d-flex flex-row mb-2 justify-content-center">
     <select @bind="SelectedViewType" class="me-2">
         <option value="@DisplayedView.Annual">Annual View</option>
         <option value="@DisplayedView.Monthly">Monthly View</option>
@@ -23,5 +23,5 @@
 
 
 @code {
-    private DisplayedView SelectedViewType = DisplayedView.Weekly;
+    private DisplayedView SelectedViewType = DisplayedView.Daily;
 }

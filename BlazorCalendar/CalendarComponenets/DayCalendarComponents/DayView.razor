@@ -1,0 +1,123 @@
+﻿@using System.Globalization
+@using BlazorCalendar.Models
+@using BlazorCalendar.Models.DayViewModels
+@using BlazorCalendar.Models.Interfaces
+@using BlazorCalendar.Services
+@using BlazorCalendar.Styles
+
+@inherits CalendarBase
+@inject TasksService TasksService
+<div class="daily-calendar-container">
+
+    <div class="daily-calendar" style="@Style">
+
+        <DTimeSideBar TimeSideBarViewModel="DayCalendarViewModel.TimeSideBarViewModel ">
+        </DTimeSideBar>
+
+        <DDayHeader DayHeaderViewModel="DayCalendarViewModel.DayHeaderViewModel">
+        </DDayHeader>
+
+        <DAllDay DayClick="DayClick"
+                 Draggable="Draggable"
+                 DragStart="DragStart"
+                 DropEventOnAllDay="DropEventOnAllDay"
+                 EventClick="EventClick"
+                 AllDayViewModel="DayCalendarViewModel.AllDayViewModel">
+        </DAllDay>
+
+        <DDay DayViewModel="DayCalendarViewModel.DayViewModel"
+              Draggable="Draggable"
+              DragStart="DragStart"
+              DropEventOnDay="DropEventOnDay"
+              EventClick="EventClick"
+              DayClick="DayClick">
+        </DDay>
+
+    </div>
+
+</div>
+
+<br />
+<div class="console">@fakeConsole</div>
+
+@code {
+    private string fakeConsole = "";
+
+    protected override void OnInitialized()
+    {
+        DayCalendarViewModel = (DayCalendarViewModel)CalendarViewModel;
+    }
+
+    protected override void OnParametersSet()
+    {
+        DayCalendarViewModel = (DayCalendarViewModel)CalendarViewModel;
+    }
+
+    private DayCalendarViewModel DayCalendarViewModel { get; set; }
+
+    [Parameter]
+    public ICalendarView CalendarViewModel { get; set; }
+
+    [Parameter]
+    public TimeDivisionEnum TimeDivisionEnum { get; set; }
+
+    [Parameter]
+    public bool HighlightToday { get; set; } = false;
+
+    private void EventClick(ClickTaskParameter clickTaskParameter)
+    {
+        fakeConsole = "ID Event(s) :" + string.Join(", ", clickTaskParameter.IDList);
+    }
+
+    private void DayClick(ClickEmptyDayParameter clickEmptyDayParameter)
+    {
+        fakeConsole = $"Empty day :{clickEmptyDayParameter.Day.ToShortDateString()}  {clickEmptyDayParameter.Day.ToShortTimeString()}";
+    }
+
+    private void DragStart(DragDropParameter dragDropParameter)
+    {
+        fakeConsole = $"DragStart event : {dragDropParameter.taskID}";
+    }
+
+    private void DropEventOnDay(DragDropParameter dragDropParameter)
+    {
+        fakeConsole = $"DropEvent event :{dragDropParameter.Day.ToShortDateString()} {dragDropParameter.taskID}";
+
+        // var droppedTask = WeekCalendarViewModel.Tasks.FirstOrDefault(t => t.ID == dragDropParameter.taskID);
+
+        // var DayCalendarDropped = WeekCalendarViewModel.DayCalendar.FirstOrDefault(x => x.Day.Date == dragDropParameter.Day.Date);
+        // var DayCalendarDragged = WeekCalendarViewModel.DayCalendar.FirstOrDefault(x => x.Day.Date == droppedTask.DateStart.Date);
+
+        // var gridItemMoved = DayCalendarDragged.GridItems.Where(x => x.Event.ID == droppedTask.ID).FirstOrDefault();
+
+        // var TotalDay = (droppedTask.DateEnd - droppedTask.DateStart).TotalDays;
+
+        // droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
+        // droppedTask.DateStart = dragDropParameter.Day;
+
+        // WeekCalendarViewModel.DayCalendar.ForEach(x =>
+        // {
+        //     x.GridItems = TasksService.GetGridItemsForDayComponent(TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks, TimeDivisionEnum), new TimeDivision(TimeDivisionEnum).Minutes, x.Day);
+
+        //     if (x.GridItems != null && x.GridItems.Count != 0)
+        //         x.MaxNumberOfColumns = x.GridItems.Max(z => z.ColumnStart);
+
+        //     x.TimeCells.ForEach(y => y.ColumnsSpan = x.MaxNumberOfColumns);
+        // });
+    }
+
+    private void DropEventOnAllDay(DragDropParameter dragDropParameter)
+    {
+        // var droppedTask = WeekCalendarViewModel.AllDay.Events.FirstOrDefault(x => x.ID == dragDropParameter.taskID);
+
+        // if (droppedTask != null)
+        // {
+        //     var TotalDay = (droppedTask.DateEnd - droppedTask.DateStart).TotalDays;
+
+        //     droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
+        //     droppedTask.DateStart = dragDropParameter.Day;
+
+        //     WeekCalendarViewModel.AllDay.GridItems = TasksService.GetGridItemsForAllDayComponent(WeekCalendarViewModel.AllDay.Events, WeekCalendarViewModel.AllDay.FirstDateWeek);
+        // }
+    }
+}

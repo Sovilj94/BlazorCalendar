@@ -1,25 +1,26 @@
 ﻿@using BlazorCalendar.Models
 @using BlazorCalendar.Models.ViewModel
+@using BlazorCalendar.Services
 @using BlazorCalendar.Styles
-@using BlazorCalendar.CalendarComponenets
 
+@inject TasksService TasksService
 
-<div class="all-day-grid">
-    <div class="title" style="grid-row-start: 1; grid-column-start: 1; font-size:small">All day</div>
-    @foreach (var timeCellViewModel in AllDay.TimeCells)
+<div class="dayGrid">
+
+    @foreach (var timeCellViewModel in DayViewModel.TimeCells)
     {
         <TimeCell DayClick="DayClick"
                   Draggable="Draggable"
-                  DropEventOnAllDay="DropEventOnAllDay"
+                  DropEventOnDay="DropEventOnDay"
                   TimeCellViewModel="timeCellViewModel">
         </TimeCell>
     }
 
-    @if(AllDay.GridItems is not null && AllDay.GridItems.Count != 0)
+    @if (DayViewModel.GridItems is not null && DayViewModel.GridItems.Count != 0)
     {
-        @foreach(var item in AllDay.GridItems)
+        foreach (var gridItem in DayViewModel.GridItems)
         {
-            <GridItem GridItemViewModel="item"
+            <GridItem GridItemViewModel="gridItem"
                       Draggable="Draggable"
                       DragStart="DragStart"
                       EventClick="EventClick">
@@ -27,10 +28,13 @@
         }
     }
 </div>
+
 @code {
 
+    public int MaxNumberOfColumnsInDay { get; set; }
+
     [Parameter]
-    public AllDayViewModel AllDay { get; set; }
+    public DayViewModel DayViewModel { get; set; }
 
     [Parameter]
     public bool Draggable { get; set; }
@@ -45,5 +49,5 @@
     public EventCallback<DragDropParameter> DragStart { get; set; }
 
     [Parameter]
-    public EventCallback<DragDropParameter> DropEventOnAllDay { get; set; }
+    public EventCallback<DragDropParameter> DropEventOnDay { get; set; }
 }

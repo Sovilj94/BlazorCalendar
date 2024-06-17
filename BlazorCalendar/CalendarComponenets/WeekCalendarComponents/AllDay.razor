@@ -1,0 +1,49 @@
+﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.ViewModel
+@using BlazorCalendar.Styles
+@using BlazorCalendar.CalendarComponenets
+
+
+<div class="all-day-grid allDay-column">
+    <div class="title" style="grid-row-start: 1; grid-column-start: 1; font-size:small">All day</div>
+    @foreach (var timeCellViewModel in AllDayViewModel.TimeCells)
+    {
+            <TimeCellAllDay DayClick="DayClick"
+                      Draggable="Draggable"
+                      DropEventOnAllDay="DropEventOnAllDay"
+                      TimeCellViewModel="timeCellViewModel">
+            </TimeCellAllDay>
+    }
+
+    @if (AllDayViewModel.GridItems is not null && AllDayViewModel.GridItems.Count != 0)
+    {
+        @foreach (var item in AllDayViewModel.GridItems)
+        {
+            <GridItem GridItemViewModel="item"
+                      Draggable="Draggable"
+                      DragStart="DragStart"
+                      EventClick="EventClick">
+            </GridItem>
+        }
+    }
+</div>
+@code {
+
+    [Parameter]
+    public AllDayViewModel AllDayViewModel { get; set; }
+
+    [Parameter]
+    public bool Draggable { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickTaskParameter> EventClick { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DragStart { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DropEventOnAllDay { get; set; }
+}

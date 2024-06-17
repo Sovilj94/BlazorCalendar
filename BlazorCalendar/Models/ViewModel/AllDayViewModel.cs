@@ -5,8 +5,6 @@ namespace BlazorCalendar.Models.ViewModel
 {
     public class AllDayViewModel
     {
-        public GridItemViewModel GridItem { get; set; }
-
         public List<GridItemViewModel> GridItems { get; set; }
 
         public List<TimeCellViewModel> TimeCells { get; set; }
