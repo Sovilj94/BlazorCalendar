@@ -83,41 +83,26 @@
     {
         fakeConsole = $"DropEvent event :{dragDropParameter.Day.ToShortDateString()} {dragDropParameter.taskID}";
 
-        // var droppedTask = WeekCalendarViewModel.Tasks.FirstOrDefault(t => t.ID == dragDropParameter.taskID);
+        var droppedTask = DayCalendarViewModel.Events.FirstOrDefault(t => t.ID == dragDropParameter.taskID);
 
-        // var DayCalendarDropped = WeekCalendarViewModel.DayCalendar.FirstOrDefault(x => x.Day.Date == dragDropParameter.Day.Date);
-        // var DayCalendarDragged = WeekCalendarViewModel.DayCalendar.FirstOrDefault(x => x.Day.Date == droppedTask.DateStart.Date);
+        var DayCalendarDropped = DayCalendarViewModel.DayViewModel;
 
-        // var gridItemMoved = DayCalendarDragged.GridItems.Where(x => x.Event.ID == droppedTask.ID).FirstOrDefault();
+        var gridItemMoved = DayCalendarDropped.GridItemsViewModel.Where(x => x.Event.ID == droppedTask.ID).FirstOrDefault();
 
-        // var TotalDay = (droppedTask.DateEnd - droppedTask.DateStart).TotalDays;
+        var TotalDay = (droppedTask.DateEnd - droppedTask.DateStart).TotalDays;
 
-        // droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
-        // droppedTask.DateStart = dragDropParameter.Day;
+        droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
+        droppedTask.DateStart = dragDropParameter.Day;
 
-        // WeekCalendarViewModel.DayCalendar.ForEach(x =>
-        // {
-        //     x.GridItems = TasksService.GetGridItemsForDayComponent(TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks, TimeDivisionEnum), new TimeDivision(TimeDivisionEnum).Minutes, x.Day);
+        DayCalendarViewModel.DayViewModel.GridItemsViewModel = TasksService.GetGridItemsForDDayComponent(DayCalendarViewModel.Events, new TimeDivision(TimeDivisionEnum).Minutes,DayCalendarViewModel.DayViewModel.Day);
 
-        //     if (x.GridItems != null && x.GridItems.Count != 0)
-        //         x.MaxNumberOfColumns = x.GridItems.Max(z => z.ColumnStart);
+        DayCalendarViewModel.DayViewModel.MaxNumberOfColumns = DayCalendarViewModel.DayViewModel.GridItemsViewModel.Max(z => z.ColumnStart);
 
-        //     x.TimeCells.ForEach(y => y.ColumnsSpan = x.MaxNumberOfColumns);
-        // });
+        DayCalendarViewModel.DayViewModel.TimeCellsViewModel.ForEach(x => x.ColumnsSpan = DayCalendarViewModel.DayViewModel.MaxNumberOfColumns);
     }
 
     private void DropEventOnAllDay(DragDropParameter dragDropParameter)
     {
-        // var droppedTask = WeekCalendarViewModel.AllDay.Events.FirstOrDefault(x => x.ID == dragDropParameter.taskID);
 
-        // if (droppedTask != null)
-        // {
-        //     var TotalDay = (droppedTask.DateEnd - droppedTask.DateStart).TotalDays;
-
-        //     droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
-        //     droppedTask.DateStart = dragDropParameter.Day;
-
-        //     WeekCalendarViewModel.AllDay.GridItems = TasksService.GetGridItemsForAllDayComponent(WeekCalendarViewModel.AllDay.Events, WeekCalendarViewModel.AllDay.FirstDateWeek);
-        // }
     }
 }

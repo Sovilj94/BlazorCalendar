@@ -253,6 +253,10 @@ namespace BlazorCalendar.Services
             {
                 List<DGridItemViewModel> gridItems = new List<DGridItemViewModel>();
 
+                // Initialize a dictionary to keep track of occupied time slots and columns
+                Dictionary<int, HashSet<int>> occupiedSlots = new Dictionary<int, HashSet<int>>();
+
+                // Order events by start time, then by end time
                 events = events.Where(x => x.DateStart.TimeOfDay != TimeSpan.Zero || x.DateEnd.TimeOfDay != TimeSpan.Zero)
                                .OrderBy(x => x.DateStart)
                                .ThenBy(x => x.DateEnd)
@@ -304,7 +308,33 @@ namespace BlazorCalendar.Services
                         gridItem.RowStart = startRowIndex;
                         gridItem.RowEnd = startRowIndex + rowSpan;
 
-                        gridItem.CSSGridPosition = $"grid-row:{gridItem.RowStart} / span {rowSpan}; grid-column:1 / span 1;";
+                        // Find the first available column
+                        gridItem.ColumnStart =  1;
+                        for (int row = gridItem.RowStart; row < gridItem.RowEnd; row++)
+                        {
+                            if (!occupiedSlots.ContainsKey(row))
+                            {
+                                occupiedSlots[row] = new HashSet<int>();
+                            }
+
+                            while (occupiedSlots[row].Contains(gridItem.ColumnStart))
+                            {
+                                gridItem.ColumnStart++;
+                            }
+                        }
+
+                        // Mark the time slots as occupied
+                        for (int row = gridItem.RowStart; row < gridItem.RowEnd; row++)
+                        {
+                            if (!occupiedSlots.ContainsKey(row))
+                            {
+                                occupiedSlots[row] = new HashSet<int>();
+                            }
+                            occupiedSlots[row].Add(gridItem.ColumnStart);
+                        }
+
+                        // Set the CSS grid position
+                        gridItem.CSSGridPosition = $"grid-row:{gridItem.RowStart} / span {rowSpan}; grid-column:{gridItem.ColumnStart};";
                         gridItems.Add(gridItem);
 
                         // If the event ends at midnight and spans multiple days, remove it to avoid duplication
@@ -323,6 +353,7 @@ namespace BlazorCalendar.Services
                 throw new ApplicationException("Error generating grid items for day component", ex);
             }
         }
+
 
 
         public List<DGridItemViewModel> GetGridItemsForDAllDayComponent(List<ICalendarEvent> events, DateTime selectedDate)
