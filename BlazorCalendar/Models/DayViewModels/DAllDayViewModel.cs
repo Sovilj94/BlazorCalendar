@@ -7,6 +7,8 @@ namespace BlazorCalendar.Models.DayViewModels
     {
         public List<DGridItemViewModel> GridItemsViewModel { get; set; }
 
+        public DGridItemListViewModel GridItemListViewModel { get; set; } = new();
+
         public DTimeCellViewModel TimeCellViewModel { get; set; }
 
         public List<ICalendarEvent> Events { get; set; }

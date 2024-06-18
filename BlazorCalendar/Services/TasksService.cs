@@ -14,6 +14,10 @@ namespace BlazorCalendar.Services
             var TasksList = new List<ICalendarEvent>()
             {
                  new Tasks { ID = 0, DateStart = today.AddHours(11), DateEnd = today.AddHours(16), Code = "HELLO", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
+                 new Tasks { ID = 15, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "POD1", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
+                 new Tasks { ID = 18, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "POD1", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
+                 new Tasks { ID = 16, DateStart = today.AddDays(3), DateEnd = today.AddDays(4), Code = "POD2", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
+                 new Tasks { ID = 17, DateStart = today.AddDays(3), DateEnd = today.AddDays(4), Code = "POD3", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
                  new Tasks { ID = 10, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "HELLO2", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
                  new Tasks { ID = 11, DateStart = today.AddDays(5), DateEnd = today.AddDays(7), Code = "Woha", Color = "#FFD801", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
                  new Tasks { ID = 1, DateStart = today.AddDays(2).AddHours(5), DateEnd = today.AddDays(2).AddHours(11), Code = "😉 CP", Color = "#19C319", Caption = "Lorem ipsum dolor sit amet" } ,
@@ -59,66 +63,66 @@ namespace BlazorCalendar.Services
             {
                 List<GridItemViewModel> gridItems = new List<GridItemViewModel>();
 
-            events = events.Where(x => x.DateStart.TimeOfDay != TimeSpan.Zero || x.DateEnd.TimeOfDay != TimeSpan.Zero)
-                           .OrderBy(x => x.DateStart)
-                           .ThenBy(x => x.DateEnd)
-                           .ToList();
+                events = events.Where(x => x.DateStart.TimeOfDay != TimeSpan.Zero || x.DateEnd.TimeOfDay != TimeSpan.Zero)
+                               .OrderBy(x => x.DateStart)
+                               .ThenBy(x => x.DateEnd)
+                               .ToList();
 
-            foreach (var currentEvent in events)
-            {
-                if (currentEvent.DateStart.Date <= day.Date && currentEvent.DateEnd.Date >= day.Date)
+                foreach (var currentEvent in events)
                 {
-                    GridItemViewModel gridItem = new GridItemViewModel
+                    if (currentEvent.DateStart.Date <= day.Date && currentEvent.DateEnd.Date >= day.Date)
                     {
-                        Event = currentEvent,
-                        EventColor = $"{Colors.GetHatching(currentEvent.FillStyle, currentEvent.Color)};color:{currentEvent.ForeColor}",
-                        ClassPin = string.IsNullOrWhiteSpace(currentEvent.Comment) ? null : " pin",
-                        ClassPointer = " cursor-pointer",
-                        Day = day
-                    };
+                        GridItemViewModel gridItem = new GridItemViewModel
+                        {
+                            Event = currentEvent,
+                            EventColor = $"{Colors.GetHatching(currentEvent.FillStyle, currentEvent.Color)};color:{currentEvent.ForeColor}",
+                            ClassPin = string.IsNullOrWhiteSpace(currentEvent.Comment) ? null : " pin",
+                            ClassPointer = " cursor-pointer",
+                            Day = day
+                        };
 
-                    DateTime taskStartHour, taskEndHour;
-                    if (currentEvent.DateStart.Date == day.Date && currentEvent.DateEnd.Date > day.Date)
-                    {
-                        // Event starts today but ends on a future date
-                        taskStartHour = currentEvent.DateStart;
-                        taskEndHour = day.AddDays(1).Date;
+                        DateTime taskStartHour, taskEndHour;
+                        if (currentEvent.DateStart.Date == day.Date && currentEvent.DateEnd.Date > day.Date)
+                        {
+                            // Event starts today but ends on a future date
+                            taskStartHour = currentEvent.DateStart;
+                            taskEndHour = day.AddDays(1).Date;
+                        }
+                        else if (currentEvent.DateStart.Date < day.Date && currentEvent.DateEnd.Date == day.Date)
+                        {
+                            // Event started in the past but ends today
+                            taskStartHour = day.Date;
+                            taskEndHour = currentEvent.DateEnd;
+                        }
+                        else if (currentEvent.DateStart.Date < day.Date && currentEvent.DateEnd.Date > day.Date)
+                        {
+                            // Event spans across the whole day
+                            taskStartHour = day.Date;
+                            taskEndHour = day.AddDays(1).Date;
+                        }
+                        else
+                        {
+                            // Event starts and ends today
+                            taskStartHour = currentEvent.DateStart;
+                            taskEndHour = currentEvent.DateEnd;
+                        }
+
+                        TimeSpan duration = taskEndHour - taskStartHour;
+                        int rowSpan = (int)Math.Ceiling(duration.TotalMinutes / minutes);
+                        int startRowIndex = (int)(taskStartHour.TimeOfDay.TotalMinutes / minutes) + 1;
+
+                        gridItem.RowStart = startRowIndex;
+                        gridItem.RowEnd = startRowIndex + rowSpan;
+
+                        gridItems.Add(gridItem);
+
+                        // naci srecnije rijesenje 
+                        if (currentEvent.DateEnd.TimeOfDay == TimeSpan.Zero && currentEvent.DateEnd.Date == day.Date && currentEvent.DateStart.Date < day.Date)
+                            gridItems.Remove(gridItem);
                     }
-                    else if (currentEvent.DateStart.Date < day.Date && currentEvent.DateEnd.Date == day.Date)
-                    {
-                        // Event started in the past but ends today
-                        taskStartHour = day.Date;
-                        taskEndHour = currentEvent.DateEnd;
-                    }
-                    else if (currentEvent.DateStart.Date < day.Date && currentEvent.DateEnd.Date > day.Date)
-                    {
-                        // Event spans across the whole day
-                        taskStartHour = day.Date;
-                        taskEndHour = day.AddDays(1).Date;
-                    }
-                    else
-                    {
-                        // Event starts and ends today
-                        taskStartHour = currentEvent.DateStart;
-                        taskEndHour = currentEvent.DateEnd;
-                    }
-
-                    TimeSpan duration = taskEndHour - taskStartHour;
-                    int rowSpan = (int)Math.Ceiling(duration.TotalMinutes / minutes);
-                    int startRowIndex = (int)(taskStartHour.TimeOfDay.TotalMinutes / minutes) + 1;
-
-                    gridItem.RowStart = startRowIndex;
-                    gridItem.RowEnd = startRowIndex + rowSpan;
-
-                    gridItems.Add(gridItem);
-
-                    // naci srecnije rijesenje 
-                    if (currentEvent.DateEnd.TimeOfDay == TimeSpan.Zero && currentEvent.DateEnd.Date == day.Date && currentEvent.DateStart.Date < day.Date)
-                        gridItems.Remove(gridItem);
                 }
-            }
 
-           
+
                 var gridItemsGroupedByDate = gridItems.GroupBy(t => t.Day.Date).ToList();
 
                 foreach (var group in gridItemsGroupedByDate)
@@ -309,7 +313,7 @@ namespace BlazorCalendar.Services
                         gridItem.RowEnd = startRowIndex + rowSpan;
 
                         // Find the first available column
-                        gridItem.ColumnStart =  1;
+                        gridItem.ColumnStart = 1;
                         for (int row = gridItem.RowStart; row < gridItem.RowEnd; row++)
                         {
                             if (!occupiedSlots.ContainsKey(row))

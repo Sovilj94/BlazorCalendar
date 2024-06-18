@@ -4,5 +4,5 @@
     font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin: 3px;
+    padding: 3px;
 }

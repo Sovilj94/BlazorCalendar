@@ -46,7 +46,7 @@ namespace BlazorCalendar.Services
             weekCalendarViewModel.Tasks = _tasksService.GetTasksForWeekViewModel(firstDateWeek, lastDateOfWeek, _tasksService.GetAllTasks());
 
             // Popunjavanje AllDayViewModela
-            weekCalendarViewModel.AllDay.Events = _tasksService.GetTasksForAllDayViewModel((List<ICalendarEvent>)_tasksService.GetAllTasks());
+            weekCalendarViewModel.AllDay.Events = _tasksService.GetTasksForAllDayViewModel(_tasksService.GetAllTasks());
             weekCalendarViewModel.AllDay.FirstDateWeek = firstDateWeek;
             weekCalendarViewModel.AllDay.TimeCells = new List<TimeCellViewModel>();
             weekCalendarViewModel.AllDay.GridItems = new List<GridItemViewModel>();
@@ -160,7 +160,7 @@ namespace BlazorCalendar.Services
                 Day = date,
                 TimeDivision = new TimeDivision(timeDivision),
                 GridItemsViewModel = _tasksService.GetGridItemsForDDayComponent(_tasksService.GetTasksForDayViewModel(date,_tasksService.GetAllTasks()), new TimeDivision(timeDivision).Minutes, date),
-                TimeCellsViewModel = new List<DTimeCellViewModel>()
+                TimeCellsViewModel = new List<DTimeCellViewModel>(),
             };
 
             if (dayCalendarViewModel.DayViewModel.GridItemsViewModel != null && dayCalendarViewModel.DayViewModel.GridItemsViewModel.Count != 0)
@@ -171,6 +171,10 @@ namespace BlazorCalendar.Services
             {
                 dayCalendarViewModel.DayViewModel.MaxNumberOfColumns = 1;
             }
+
+            dayCalendarViewModel.AllDayViewModel.GridItemListViewModel = new DGridItemListViewModel();
+            dayCalendarViewModel.AllDayViewModel.GridItemListViewModel.GridItemsViewModel = new List<DGridItemViewModel>();
+            dayCalendarViewModel.AllDayViewModel.GridItemListViewModel.GridItemsViewModel = dayCalendarViewModel.AllDayViewModel.GridItemsViewModel;
 
             for (int dayTime = 0; dayTime < dayCalendarViewModel.DayViewModel.TimeDivision.NumberOfCells; dayTime++)
             {
@@ -183,7 +187,7 @@ namespace BlazorCalendar.Services
                     ColumnsSpan = dayCalendarViewModel.DayViewModel.MaxNumberOfColumns,
                     CSSGridPosition = $"grid-row:{row}; grid-column:1 / span {dayCalendarViewModel.DayViewModel.MaxNumberOfColumns};",
                     Time = time,
-                    CSSbackground = null //GetBackground(dayCalendarViewModel.DayViewModel.Day, dayCalendarViewModel.DayViewModel)
+                    CSSbackground = "" //GetBackground(dayCalendarViewModel.DayViewModel.Day, dayCalendarViewModel.DayViewModel)
                 };
 
                 dayCalendarViewModel.DayViewModel.TimeCellsViewModel.Add(timeCell);

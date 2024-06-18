@@ -7,25 +7,37 @@
 
 <div class="title" style="grid-row-start: 2;grid-column-start:1; font-size:small">All day</div>
 
-    <div class="dall-day-grid" style="grid-row-start: 2;">
-        <DTimeCellAllDay DayClick="DayClick"
-                   Draggable="Draggable"
-                   DropEventOnAllDay="DropEventOnAllDay"
-                   TimeCellViewModel="AllDayViewModel.TimeCellViewModel">
-        </DTimeCellAllDay>
+<div class="dall-day-grid" style="grid-row-start: 2;">
 
-        @if (AllDayViewModel.GridItemsViewModel is not null && AllDayViewModel.GridItemsViewModel.Count != 0)
+    <DTimeCellAllDay DayClick="DayClick"
+                     Draggable="Draggable"
+                     DropEventOnAllDay="DropEventOnAllDay"
+                     TimeCellViewModel="AllDayViewModel.TimeCellViewModel">
+    </DTimeCellAllDay>
+
+    @if (AllDayViewModel.GridItemsViewModel is not null && AllDayViewModel.GridItemsViewModel.Count > 0)
+    {
+        @for (var i = 0; i < AllDayViewModel.GridItemsViewModel.Count; i++)
         {
-            @foreach (var item in AllDayViewModel.GridItemsViewModel)
+            if (i <= 3)
             {
-                <DGridItem GridItemViewModel="item"
+                <DGridItem GridItemViewModel="AllDayViewModel.GridItemsViewModel[i]"
                            Draggable="Draggable"
                            DragStart="DragStart"
                            EventClick="EventClick">
                 </DGridItem>
             }
         }
-    </div>
+    }
+    @if (AllDayViewModel.GridItemsViewModel.Count > 4)
+    {
+        <DGridItemList NumberOfAdditionalEvents="AllDayViewModel.GridItemsViewModel.Count - 4"
+                       EventClick="EventClick"
+                       GridItemListViewModel="AllDayViewModel.GridItemListViewModel">
+
+        </DGridItemList>
+    }
+</div>
 @code {
 
     [Parameter]
