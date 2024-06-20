@@ -1,0 +1,60 @@
+﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.DayViewModels
+@using BlazorCalendar.Styles
+@using BlazorCalendar.CalendarComponenets
+
+
+
+<div class="title" style="grid-row-start: 2;grid-column-start:1; font-size:small">All day</div>
+
+<div class="dall-day-grid" style="grid-row-start: 2;">
+
+    <DayTimeCellAllDay DayClick="DayClick"
+                     Draggable="Draggable"
+                     DropEventOnAllDay="DropEventOnAllDay"
+                     TimeCellViewModel="AllDayViewModel.TimeCellViewModel">
+    </DayTimeCellAllDay>
+
+    @if (AllDayViewModel.GridItemsViewModel is not null && AllDayViewModel.GridItemsViewModel.Count > 0)
+    {
+        @for (var i = 0; i < AllDayViewModel.GridItemsViewModel.Count; i++)
+        {
+            if (i <= 3)
+            {
+                <DayGridItem GridItemViewModel="AllDayViewModel.GridItemsViewModel[i]"
+                           Draggable="Draggable"
+                           DragStart="DragStart"
+                           EventClick="EventClick">
+                </DayGridItem>
+            }
+        }
+    }
+    @if (AllDayViewModel.GridItemsViewModel.Count > 4)
+    {
+        <DayGridItemList NumberOfAdditionalEvents="AllDayViewModel.GridItemsViewModel.Count - 4"
+                       EventClick="EventClick"
+                       GridItemListViewModel="AllDayViewModel.GridItemListViewModel">
+
+        </DayGridItemList>
+    }
+</div>
+@code {
+
+    [Parameter]
+    public DayAllDayViewModel AllDayViewModel { get; set; }
+
+    [Parameter]
+    public bool Draggable { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickTaskParameter> EventClick { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DragStart { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DropEventOnAllDay { get; set; }
+}

@@ -4,13 +4,13 @@ namespace BlazorCalendar.Models.DayViewModels
 {
     public class DayCalendarViewModel : ICalendarView
     {
-        public DDayHeaderViewModel DayHeaderViewModel { get; set; }
+        public DayDayHeaderViewModel DayHeaderViewModel { get; set; }
 
-        public DAllDayViewModel AllDayViewModel { get; set; }
+        public DayAllDayViewModel AllDayViewModel { get; set; }
 
-        public DTimeSideBarViewModel TimeSideBarViewModel { get; set; }
+        public DayTimeSideBarViewModel TimeSideBarViewModel { get; set; }
 
-        public DDayViewModel DayViewModel { get; set; }
+        public DayDayViewModel DayViewModel { get; set; }
 
         public List<ICalendarEvent> Events { get; set; }
     }

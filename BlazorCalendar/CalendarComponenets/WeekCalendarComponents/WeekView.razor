@@ -1,6 +1,6 @@
 ﻿@using System.Globalization
 @using BlazorCalendar.Models
-@using BlazorCalendar.Models.ViewModel
+@using BlazorCalendar.Models.WeekViewModels
 @using BlazorCalendar.Models.Interfaces
 @using BlazorCalendar.Services
 @using BlazorCalendar.Styles
@@ -10,35 +10,35 @@
 
 <div class="weekly-calendar" style="@Style">
 
-    <TimeSideBar TimeSideBarViewModel="WeekCalendarViewModel.TimeSideBar ">
-    </TimeSideBar>
+    <WeekTimeSideBar TimeSideBarViewModel="WeekCalendarViewModel.TimeSideBar ">
+    </WeekTimeSideBar>
 
     @for (int i = 0; i < WeekCalendarViewModel.DayHeader.Count; i++)
     {
         <div class="day-header-column" style="grid-column-start: @(i+2);">
-            <DayHeader DayHeaderViewModel="WeekCalendarViewModel.DayHeader[i]">
-            </DayHeader>
+            <WeekDayHeader DayHeaderViewModel="WeekCalendarViewModel.DayHeader[i]">
+            </WeekDayHeader>
         </div>
     }
 
-    <AllDay DayClick="DayClick"
+    <WeekAllDay DayClick="DayClick"
                  Draggable="Draggable"
                  DragStart="DragStart"
                  DropEventOnAllDay="DropEventOnAllDay"
                  EventClick="EventClick"
                 AllDayViewModel="WeekCalendarViewModel.AllDay">
-    </AllDay>
+    </WeekAllDay>
 
     @for (int i = 0; i < WeekCalendarViewModel.DayCalendar.Count; i++)
     {
         <div class="day-column" style="grid-column-start: @(i+2);">
-            <Day DayViewModel="WeekCalendarViewModel.DayCalendar[i]"
+            <WeekDay DayViewModel="WeekCalendarViewModel.DayCalendar[i]"
                          Draggable="Draggable"
                          DragStart="DragStart"
                          DropEventOnDay="DropEventOnDay"
                          EventClick="EventClick"
                          DayClick="DayClick">
-            </Day>
+            </WeekDay>
         </div>
     }
 </div>

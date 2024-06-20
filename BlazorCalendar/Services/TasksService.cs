@@ -1,7 +1,7 @@
 ﻿using BlazorCalendar.Models;
 using BlazorCalendar.Models.DayViewModels;
 using BlazorCalendar.Models.Interfaces;
-using BlazorCalendar.Models.ViewModel;
+using BlazorCalendar.Models.WeekViewModels;
 using BlazorCalendar.Styles;
 
 namespace BlazorCalendar.Services
@@ -57,11 +57,11 @@ namespace BlazorCalendar.Services
             return EventList;
         }
 
-        public List<GridItemViewModel> GetGridItemsForDayComponent(List<ICalendarEvent> events, int minutes, DateTime day)
+        public List<WeekGridItemViewModel> GetGridItemsForDayComponent(List<ICalendarEvent> events, int minutes, DateTime day)
         {
             try
             {
-                List<GridItemViewModel> gridItems = new List<GridItemViewModel>();
+                List<WeekGridItemViewModel> gridItems = new List<WeekGridItemViewModel>();
 
                 events = events.Where(x => x.DateStart.TimeOfDay != TimeSpan.Zero || x.DateEnd.TimeOfDay != TimeSpan.Zero)
                                .OrderBy(x => x.DateStart)
@@ -72,7 +72,7 @@ namespace BlazorCalendar.Services
                 {
                     if (currentEvent.DateStart.Date <= day.Date && currentEvent.DateEnd.Date >= day.Date)
                     {
-                        GridItemViewModel gridItem = new GridItemViewModel
+                        WeekGridItemViewModel gridItem = new WeekGridItemViewModel
                         {
                             Event = currentEvent,
                             EventColor = $"{Colors.GetHatching(currentEvent.FillStyle, currentEvent.Color)};color:{currentEvent.ForeColor}",
@@ -160,15 +160,15 @@ namespace BlazorCalendar.Services
             catch (Exception ex)
             {
                 Console.WriteLine($"Error grouping grid items: {ex.Message}");
-                return new List<GridItemViewModel>();
+                return new List<WeekGridItemViewModel>();
             }
         }
 
-        public List<GridItemViewModel> GetGridItemsForAllDayComponent(List<ICalendarEvent> events, DateTime firstDateOfWeek)
+        public List<WeekGridItemViewModel> GetGridItemsForAllDayComponent(List<ICalendarEvent> events, DateTime firstDateOfWeek)
         {
             HashSet<(int, DateTime)> dayAndNumbers = new HashSet<(int number, DateTime day)>();
 
-            List<GridItemViewModel> gridItems = new List<GridItemViewModel>();
+            List<WeekGridItemViewModel> gridItems = new List<WeekGridItemViewModel>();
             int counter = 0;
 
             for (int i = 2; i <= 8; i++)
@@ -188,13 +188,13 @@ namespace BlazorCalendar.Services
 
             if (eventsForWeek.Count == 0)
             {
-                return new List<GridItemViewModel>();
+                return new List<WeekGridItemViewModel>();
             }
 
             foreach (var ev in eventsForWeek)
             {
                 var colorHatching = Colors.GetHatching(ev.FillStyle, ev.Color);
-                GridItemViewModel gridItem = new GridItemViewModel
+                WeekGridItemViewModel gridItem = new WeekGridItemViewModel
                 {
                     Event = ev,
                     GridItemColor = $"{colorHatching} color:{ev.ForeColor}",
@@ -251,11 +251,11 @@ namespace BlazorCalendar.Services
         }
 
 
-        public List<DGridItemViewModel> GetGridItemsForDDayComponent(List<ICalendarEvent> events, int minutes, DateTime day)
+        public List<DayGridItemViewModel> GetGridItemsForDDayComponent(List<ICalendarEvent> events, int minutes, DateTime day)
         {
             try
             {
-                List<DGridItemViewModel> gridItems = new List<DGridItemViewModel>();
+                List<DayGridItemViewModel> gridItems = new List<DayGridItemViewModel>();
 
                 // Initialize a dictionary to keep track of occupied time slots and columns
                 Dictionary<int, HashSet<int>> occupiedSlots = new Dictionary<int, HashSet<int>>();
@@ -270,7 +270,7 @@ namespace BlazorCalendar.Services
                 {
                     if (currentEvent.DateStart.Date <= day.Date && currentEvent.DateEnd.Date >= day.Date)
                     {
-                        DGridItemViewModel gridItem = new DGridItemViewModel
+                        DayGridItemViewModel gridItem = new DayGridItemViewModel
                         {
                             Event = currentEvent,
                             EventColor = $"{Colors.GetHatching(currentEvent.FillStyle, currentEvent.Color)};color:{currentEvent.ForeColor}",
@@ -360,9 +360,9 @@ namespace BlazorCalendar.Services
 
 
 
-        public List<DGridItemViewModel> GetGridItemsForDAllDayComponent(List<ICalendarEvent> events, DateTime selectedDate)
+        public List<DayGridItemViewModel> GetGridItemsForDAllDayComponent(List<ICalendarEvent> events, DateTime selectedDate)
         {
-            List<DGridItemViewModel> gridItems = new List<DGridItemViewModel>();
+            List<DayGridItemViewModel> gridItems = new List<DayGridItemViewModel>();
 
             // Filter events for the selected day
             List<ICalendarEvent> eventsForDay = events.Where(ev =>
@@ -374,13 +374,13 @@ namespace BlazorCalendar.Services
 
             if (eventsForDay.Count == 0)
             {
-                return new List<DGridItemViewModel>();
+                return new List<DayGridItemViewModel>();
             }
 
             foreach (var ev in eventsForDay)
             {
                 var colorHatching = Colors.GetHatching(ev.FillStyle, ev.Color);
-                DGridItemViewModel gridItem = new DGridItemViewModel
+                DayGridItemViewModel gridItem = new DayGridItemViewModel
                 {
                     Event = ev,
                     GridItemColor = $"{colorHatching} color:{ev.ForeColor}",

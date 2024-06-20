@@ -1,7 +1,7 @@
 ﻿using BlazorCalendar.Models;
 using BlazorCalendar.Models.DayViewModels;
 using BlazorCalendar.Models.Interfaces;
-using BlazorCalendar.Models.ViewModel;
+using BlazorCalendar.Models.WeekViewModels;
 using System.Globalization;
 
 namespace BlazorCalendar.Services
@@ -39,23 +39,23 @@ namespace BlazorCalendar.Services
 
             // Inicijalizacija view modela
             WeekCalendarViewModel weekCalendarViewModel = new WeekCalendarViewModel();
-            weekCalendarViewModel.DayHeader = new List<DayHeaderViewModel>();
-            weekCalendarViewModel.AllDay = new AllDayViewModel();
-            weekCalendarViewModel.TimeSideBar = new TimeSideBarViewModel();
-            weekCalendarViewModel.DayCalendar = new List<DayViewModel>();
+            weekCalendarViewModel.DayHeader = new List<WeekDayHeaderViewModel>();
+            weekCalendarViewModel.AllDay = new WeekAllDayViewModel();
+            weekCalendarViewModel.TimeSideBar = new WeekTimeSideBarViewModel();
+            weekCalendarViewModel.DayCalendar = new List<WeekDayViewModel>();
             weekCalendarViewModel.Tasks = _tasksService.GetTasksForWeekViewModel(firstDateWeek, lastDateOfWeek, _tasksService.GetAllTasks());
 
             // Popunjavanje AllDayViewModela
             weekCalendarViewModel.AllDay.Events = _tasksService.GetTasksForAllDayViewModel(_tasksService.GetAllTasks());
             weekCalendarViewModel.AllDay.FirstDateWeek = firstDateWeek;
-            weekCalendarViewModel.AllDay.TimeCells = new List<TimeCellViewModel>();
-            weekCalendarViewModel.AllDay.GridItems = new List<GridItemViewModel>();
+            weekCalendarViewModel.AllDay.TimeCells = new List<WeekTimeCellViewModel>();
+            weekCalendarViewModel.AllDay.GridItems = new List<WeekGridItemViewModel>();
             weekCalendarViewModel.AllDay.GridItems = _tasksService.GetGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Events, firstDateWeek);
 
             // TimeCells
             for (int column = 0; column < 7; column++)
             {
-                TimeCellViewModel timeCell = new TimeCellViewModel();
+                WeekTimeCellViewModel timeCell = new WeekTimeCellViewModel();
                 timeCell.IsAllDayTimesCell = true;
                 timeCell.Time = weekCalendarViewModel.AllDay.FirstDateWeek.AddDays(column);
                 timeCell.Column = column + 2;
@@ -72,18 +72,18 @@ namespace BlazorCalendar.Services
             {
                 int d = Dates.GetNumOfDay(i);
                 DateTime day = firstDateWeek.AddDays(i);
-                var dayHeader = new DayHeaderViewModel
+                var dayHeader = new WeekDayHeaderViewModel
                 {
                     DayName = _dayNames[d],
                     DayDate = day.ToString("dd.MM")
                 };
 
-                var dayCalendar = new DayViewModel
+                var dayCalendar = new WeekDayViewModel
                 {
                     Day = day,
                     TimeDivision = new TimeDivision(timeDivision),
                     GridItems = _tasksService.GetGridItemsForDayComponent(_tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks), new TimeDivision(timeDivision).Minutes,day),
-                    TimeCells = new List<TimeCellViewModel>()
+                    TimeCells = new List<WeekTimeCellViewModel>()
                 };
 
                 if (dayCalendar.GridItems != null && dayCalendar.GridItems.Count != 0)
@@ -100,7 +100,7 @@ namespace BlazorCalendar.Services
                     DateTime time = dayCalendar.Day.AddMinutes(dayTime * dayCalendar.TimeDivision.Minutes);
                     int row = dayTime + 1;
 
-                    TimeCellViewModel timeCell = new TimeCellViewModel();
+                    WeekTimeCellViewModel timeCell = new WeekTimeCellViewModel();
 
                     timeCell.Row = row;
                     timeCell.ColumnsSpan = dayCalendar.MaxNumberOfColumns;
@@ -123,23 +123,23 @@ namespace BlazorCalendar.Services
         {
             // Inicijalizacija view modela
             DayCalendarViewModel dayCalendarViewModel = new DayCalendarViewModel();
-            dayCalendarViewModel.DayHeaderViewModel = new DDayHeaderViewModel
+            dayCalendarViewModel.DayHeaderViewModel = new DayDayHeaderViewModel
             {
                 DayName = _dayNames[(int)date.DayOfWeek],
                 DayDate = date.ToString("dd.MM")
             };
 
-            dayCalendarViewModel.AllDayViewModel = new DAllDayViewModel
+            dayCalendarViewModel.AllDayViewModel = new DayAllDayViewModel
             {
                 Events = _tasksService.GetTasksForAllDayViewModel(_tasksService.GetAllTasks()),
                 FirstDateWeek = date.Date,
-                TimeCellViewModel = new DTimeCellViewModel(),
-                GridItemsViewModel = new List<DGridItemViewModel>()
+                TimeCellViewModel = new DayTimeCellViewModel(),
+                GridItemsViewModel = new List<DayGridItemViewModel>()
             };
             dayCalendarViewModel.AllDayViewModel.GridItemsViewModel = _tasksService.GetGridItemsForDAllDayComponent(dayCalendarViewModel.AllDayViewModel.Events, date.Date);
 
             // TimeCells for AllDayViewModel
-            DTimeCellViewModel allDayTimeCell = new DTimeCellViewModel
+            DayTimeCellViewModel allDayTimeCell = new DayTimeCellViewModel
             {
                 IsAllDayTimesCell = true,
                 Time = date,
@@ -149,18 +149,18 @@ namespace BlazorCalendar.Services
             dayCalendarViewModel.AllDayViewModel.TimeCellViewModel = allDayTimeCell;
 
             // TimeSideBar
-            dayCalendarViewModel.TimeSideBarViewModel = new DTimeSideBarViewModel
+            dayCalendarViewModel.TimeSideBarViewModel = new DayTimeSideBarViewModel
             {
                 TimeDivision = new TimeDivision(timeDivision)
             };
 
             // Main Day View
-            dayCalendarViewModel.DayViewModel = new DDayViewModel
+            dayCalendarViewModel.DayViewModel = new DayDayViewModel
             {
                 Day = date,
                 TimeDivision = new TimeDivision(timeDivision),
                 GridItemsViewModel = _tasksService.GetGridItemsForDDayComponent(_tasksService.GetTasksForDayViewModel(date,_tasksService.GetAllTasks()), new TimeDivision(timeDivision).Minutes, date),
-                TimeCellsViewModel = new List<DTimeCellViewModel>(),
+                TimeCellsViewModel = new List<DayTimeCellViewModel>(),
             };
 
             if (dayCalendarViewModel.DayViewModel.GridItemsViewModel != null && dayCalendarViewModel.DayViewModel.GridItemsViewModel.Count != 0)
@@ -172,8 +172,8 @@ namespace BlazorCalendar.Services
                 dayCalendarViewModel.DayViewModel.MaxNumberOfColumns = 1;
             }
 
-            dayCalendarViewModel.AllDayViewModel.GridItemListViewModel = new DGridItemListViewModel();
-            dayCalendarViewModel.AllDayViewModel.GridItemListViewModel.GridItemsViewModel = new List<DGridItemViewModel>();
+            dayCalendarViewModel.AllDayViewModel.GridItemListViewModel = new DayGridItemListViewModel();
+            dayCalendarViewModel.AllDayViewModel.GridItemListViewModel.GridItemsViewModel = new List<DayGridItemViewModel>();
             dayCalendarViewModel.AllDayViewModel.GridItemListViewModel.GridItemsViewModel = dayCalendarViewModel.AllDayViewModel.GridItemsViewModel;
 
             for (int dayTime = 0; dayTime < dayCalendarViewModel.DayViewModel.TimeDivision.NumberOfCells; dayTime++)
@@ -181,7 +181,7 @@ namespace BlazorCalendar.Services
                 DateTime time = dayCalendarViewModel.DayViewModel.Day.AddMinutes(dayTime * dayCalendarViewModel.DayViewModel.TimeDivision.Minutes);
                 int row = dayTime + 1;
 
-                DTimeCellViewModel timeCell = new DTimeCellViewModel
+                DayTimeCellViewModel timeCell = new DayTimeCellViewModel
                 {
                     Row = row,
                     ColumnsSpan = dayCalendarViewModel.DayViewModel.MaxNumberOfColumns,
@@ -198,7 +198,7 @@ namespace BlazorCalendar.Services
             return dayCalendarViewModel;
         }
 
-        private string GetBackground(DateTime day, DayViewModel dayViewModel)
+        private string GetBackground(DateTime day, WeekDayViewModel dayViewModel)
         {
             int d = (int)day.DayOfWeek;
 

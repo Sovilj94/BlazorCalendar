@@ -12,27 +12,27 @@
 
     <div class="daily-calendar" style="@Style">
 
-        <DTimeSideBar TimeSideBarViewModel="DayCalendarViewModel.TimeSideBarViewModel ">
-        </DTimeSideBar>
+        <DayTimeSideBar TimeSideBarViewModel="DayCalendarViewModel.TimeSideBarViewModel ">
+        </DayTimeSideBar>
 
-        <DDayHeader DayHeaderViewModel="DayCalendarViewModel.DayHeaderViewModel">
-        </DDayHeader>
+        <DayDayHeader DayHeaderViewModel="DayCalendarViewModel.DayHeaderViewModel">
+        </DayDayHeader>
 
-        <DAllDay DayClick="DayClick"
+        <DayAllDay DayClick="DayClick"
                  Draggable="Draggable"
                  DragStart="DragStart"
                  DropEventOnAllDay="DropEventOnAllDay"
                  EventClick="EventClick"
                  AllDayViewModel="DayCalendarViewModel.AllDayViewModel">
-        </DAllDay>
+        </DayAllDay>
 
-        <DDay DayViewModel="DayCalendarViewModel.DayViewModel"
+        <DayDay DayViewModel="DayCalendarViewModel.DayViewModel"
               Draggable="Draggable"
               DragStart="DragStart"
               DropEventOnDay="DropEventOnDay"
               EventClick="EventClick"
               DayClick="DayClick">
-        </DDay>
+        </DayDay>
 
     </div>
 

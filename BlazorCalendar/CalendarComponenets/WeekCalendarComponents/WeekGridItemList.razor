@@ -1,0 +1,44 @@
+﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.Interfaces
+@using BlazorCalendar.Models.WeekViewModels
+
+@inject ITaskDraggedService TaskDraggedService
+
+<div class="@($"hour-list-task {GridItemViewModel.ClassPin}{GridItemViewModel.ClassPointer} border-start border-top border-bottom")"
+     style="@GridItemViewModel.CSSGridPosition @GridItemViewModel.EventColor"
+     draggable="@Draggable.ToString()"
+     @onclick="e => ClickEventInternal(e, 1, GridItemViewModel.Day)">
+    +1
+</div>
+
+@code {
+    [Parameter]
+    public WeekGridItemListViewModel GridItemViewModel { get; set; }
+
+    [Parameter]
+    public bool Draggable { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickTaskParameter> EventClick { get; set; }
+
+    private async Task ClickEventInternal(MouseEventArgs e, int taskID, DateTime day)
+    {
+        if (!EventClick.HasDelegate)
+            return;
+
+        List<int> listID = new()
+        {
+            taskID
+        };
+
+        ClickTaskParameter clickTaskParameter = new()
+            {
+                IDList = listID,
+                X = e.ClientX,
+                Y = e.ClientY,
+                Day = day
+            };
+
+        await EventClick.InvokeAsync(clickTaskParameter);
+    }
+}
