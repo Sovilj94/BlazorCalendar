@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.AspNetCore.Components;
+
 namespace BlazorCalendar.Models.WeekViewModels
 {
     public class WeekDayViewModel
@@ -11,11 +13,11 @@ namespace BlazorCalendar.Models.WeekViewModels
 
         public DateTime Day { get; set; }
 
-        public string SaturdayColor { get; set; }
+        public string WeekDaysColor { get; set; } = "#FFF";
 
-        public string SundayColor { get; set; }
+        public string SaturdayColor { get; set; } = "#ECF4FD";
 
-        public string WeekDaysColor { get; set; }
+        public string SundayColor { get; set; } = "#DBE7F8";
 
         public int? MaxNumberOfColumns { get; set; }
     }

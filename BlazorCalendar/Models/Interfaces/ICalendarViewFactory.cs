@@ -8,6 +8,6 @@ namespace BlazorCalendar.Models.Interfaces
 {
     public interface ICalendarViewFactory
     {
-        ICalendarView CreateCalendarView(DisplayedView viewType, DateTime firstDate, TimeDivisionEnum timeDivision);
+        ICalendarView CreateCalendarView(DateTime firstDate, TimeDivisionEnum timeDivision);
     }
 }

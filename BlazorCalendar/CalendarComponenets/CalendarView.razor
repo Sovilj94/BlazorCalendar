@@ -9,7 +9,6 @@
 @inherits CalendarBase
 
 @inject TasksService TasksService
-@inject ICalendarViewFactory CalendarViewFactory
 
 <CalendarNavigation SelectedViewType="SelectedViewType"
                     ClicMonthNavigate="ClicMonthNavigate"
@@ -47,13 +46,13 @@ else if (SelectedViewType == DisplayedView.Daily)
     protected override void OnInitialized()
     {
         FirstDate = DateTime.Today;
-        CalendarViewModel = CalendarViewFactory.CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
+        CalendarViewModel = new CalendarViewFactoryProvider().CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
 
     }
 
     protected override void OnParametersSet()
     {
-        CalendarViewModel = CalendarViewFactory.CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
+        CalendarViewModel = new CalendarViewFactoryProvider().CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
     }
 
     private void ChangeFirstDate(string value)
@@ -77,7 +76,7 @@ else if (SelectedViewType == DisplayedView.Daily)
 
     private void RefreshCalendarModel()
     {
-        CalendarViewModel = CalendarViewFactory.CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
+        CalendarViewModel = new CalendarViewFactoryProvider().CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
         StateHasChanged();
     }
 
