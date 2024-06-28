@@ -1,0 +1,47 @@
+﻿.monthly-task {
+    border-radius: 3px;
+    padding: 2px 8px 2px 6px;
+    margin: 3px 11px 0 9px;
+    font-size: 0.8em;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+    color: #000;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 2vh;
+}
+
+@media (max-width: 767.98px) {
+    .monthly-task {
+        padding: 0px 8px 0px 4px;
+        margin: 3px 2px 0 4px;
+    }
+}
+
+.monthly-task-first {
+    align-self: start;
+    margin-top: 22px;
+}
+
+.monthly-task-second {
+    align-self: center;
+    margin-top: 8px;
+}
+
+.monthly-task-bottom {
+    align-self: end;
+    margin-bottom: 14px;
+}
+
+.monthly-more-tasks {
+    position: relative;
+    cursor: zoom-in;
+    align-self: end;
+    margin-top: 40px;
+    font-size: 0.6em;
+    font-weight: 600;
+    color: darkblue;
+    align-self: end;
+    margin-left: 10px;
+}

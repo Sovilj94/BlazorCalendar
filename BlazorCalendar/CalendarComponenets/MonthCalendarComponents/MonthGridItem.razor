@@ -1,0 +1,67 @@
+﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.Interfaces
+@using BlazorCalendar.Models.MonthViewModels
+
+@inject ITaskDraggedService TaskDraggedService
+
+<div class="fade-in monthly-task @MonthGridItemViewModel.CSSClass cursor-pointer"
+     id="task-@MonthGridItemViewModel.Event.ID"
+     style="@MonthGridItemViewModel.CSSGridPosition; @MonthGridItemViewModel.GridItemColor"
+     title="@MonthGridItemViewModel.Event.Comment"
+     draggable="@Draggable.ToString()"
+     @ondragstart="(e) => HandleDragStart(MonthGridItemViewModel.Event.ID)"
+     @onclick="e => ClickEventInternal(e, MonthGridItemViewModel.Event.ID, MonthGridItemViewModel.Day)">
+    @TaskContent
+</div>
+@code {
+    [Parameter]
+    public MonthGridItemViewModel MonthGridItemViewModel { get; set; }
+
+    [Parameter]
+    public bool Draggable { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickTaskParameter> EventClick { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DragStart { get; set; }
+
+    private string TaskContent => string.IsNullOrWhiteSpace(MonthGridItemViewModel.Event.Code) ? MonthGridItemViewModel.Event.Caption : MonthGridItemViewModel.Event.Code;
+
+    private async Task ClickEventInternal(MouseEventArgs e, int taskID, DateTime day)
+    {
+        if (!EventClick.HasDelegate)
+            return;
+
+        List<int> listID = new()
+        {
+            taskID
+        };
+
+        ClickTaskParameter clickTaskParameter = new()
+            {
+                IDList = listID,
+                X = e.ClientX,
+                Y = e.ClientY,
+                Day = day
+            };
+
+        await EventClick.InvokeAsync(clickTaskParameter);
+    }
+
+    private async Task HandleDragStart(int taskID)
+    {
+        TaskDraggedService.TaskDragged = new Tasks()
+            {
+                ID = taskID
+            };
+
+        DragDropParameter dragDropParameter = new()
+            {
+                taskID = TaskDraggedService.TaskDragged.ID
+            };
+
+        await DragStart.InvokeAsync(dragDropParameter);
+    }
+
+}

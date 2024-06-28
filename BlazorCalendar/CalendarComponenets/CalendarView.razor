@@ -1,13 +1,16 @@
-﻿@using BlazorCalendar.Models
+﻿@using BlazorCalendar.FactoryClasses
+@using BlazorCalendar.Models
 @using BlazorCalendar.Models.WeekViewModels
 @using BlazorCalendar.Models.Interfaces
 @using System.Globalization
 @using BlazorCalendar.Services
 @using BlazorCalendar.CalendarComponenets.WeekCalendarComponents
 @using BlazorCalendar.CalendarComponenets.DayCalendarComponents
+@using BlazorCalendar.CalendarComponenets.MonthCalendarComponents
 
 @inherits CalendarBase
 
+@inject CalendarViewFactoryProvider CalendarViewFactoryProvider
 @inject TasksService TasksService
 
 <CalendarNavigation SelectedViewType="SelectedViewType"
@@ -32,6 +35,12 @@ else if (SelectedViewType == DisplayedView.Daily)
              CalendarViewModel="CalendarViewModel">
     </DayView>
 }
+else if (SelectedViewType == DisplayedView.Monthly)
+{
+    <MonthView CalendarViewModel="CalendarViewModel"
+               Draggable="Draggable">
+    </MonthView>
+}
 
 @code {
     public DateTime FirstDate { get; set; }
@@ -41,18 +50,18 @@ else if (SelectedViewType == DisplayedView.Daily)
     public ICalendarView CalendarViewModel { get; set; }
 
     [Parameter]
-    public DisplayedView SelectedViewType { get; set; } = DisplayedView.Weekly;
+    public DisplayedView SelectedViewType { get; set; }
 
     protected override void OnInitialized()
     {
         FirstDate = DateTime.Today;
-        CalendarViewModel = new CalendarViewFactoryProvider().CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
+        CalendarViewModel = CalendarViewFactoryProvider.CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum, TasksService.GetAllTasks());
 
     }
 
     protected override void OnParametersSet()
     {
-        CalendarViewModel = new CalendarViewFactoryProvider().CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
+        CalendarViewModel = CalendarViewFactoryProvider.CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum, TasksService.GetAllTasks());
     }
 
     private void ChangeFirstDate(string value)
@@ -70,13 +79,21 @@ else if (SelectedViewType == DisplayedView.Daily)
 
     private void ClicMonthNavigate(int daysToAdd)
     {
-        FirstDate = FirstDate.AddDays(daysToAdd);
+        if (SelectedViewType == DisplayedView.Daily || SelectedViewType == DisplayedView.Weekly)
+        {
+            FirstDate = FirstDate.AddDays(daysToAdd);
+        }
+        else if (SelectedViewType == DisplayedView.Monthly)
+        {
+            FirstDate = FirstDate.AddMonths(daysToAdd);
+        }
+
         RefreshCalendarModel();
     }
 
     private void RefreshCalendarModel()
     {
-        CalendarViewModel = new CalendarViewFactoryProvider().CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum);
+        CalendarViewModel = CalendarViewFactoryProvider.CreateCalendarView(SelectedViewType, FirstDate, TimeDivisionEnum, TasksService.GetAllTasks());
         StateHasChanged();
     }
 

@@ -1,0 +1,10 @@
+﻿@using BlazorCalendar.Models.MonthViewModels
+
+<span class="header-name noselect" style="@MonthDayHeaderViewModel.HeaderStyle">
+    @MonthDayHeaderViewModel.DayName
+</span>
+
+@code {
+    [Parameter]
+    public MonthDayHeaderViewModel MonthDayHeaderViewModel { get; set; }
+}

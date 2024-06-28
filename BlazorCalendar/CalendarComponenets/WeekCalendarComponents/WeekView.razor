@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using BlazorCalendar.FactoryClasses
 @using BlazorCalendar.Models
 @using BlazorCalendar.Models.WeekViewModels
 @using BlazorCalendar.Models.Interfaces
@@ -103,7 +104,7 @@
 
         WeekCalendarViewModel.DayCalendar.ForEach(x => 
         {
-            x.GridItems = TasksService.GetGridItemsForDayComponent(TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks), new TimeDivision(TimeDivisionEnum).Minutes, x.Day);
+            x.GridItems = new WeekCalendarViewFactory().GetGridItemsForDayComponent(TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks), new TimeDivision(TimeDivisionEnum).Minutes, x.Day);
 
             if(x.GridItems != null && x.GridItems.Count != 0)
             x.MaxNumberOfColumns = x.GridItems.Max(z => z.ColumnStart);
@@ -123,7 +124,7 @@
             droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
             droppedTask.DateStart = dragDropParameter.Day;
 
-            WeekCalendarViewModel.AllDay.GridItems = TasksService.GetGridItemsForAllDayComponent(WeekCalendarViewModel.AllDay.Events, WeekCalendarViewModel.AllDay.FirstDateWeek);
+            WeekCalendarViewModel.AllDay.GridItems = new WeekCalendarViewFactory().GetGridItemsForAllDayComponent(WeekCalendarViewModel.AllDay.Events, WeekCalendarViewModel.AllDay.FirstDateWeek);
         }
     }
 }

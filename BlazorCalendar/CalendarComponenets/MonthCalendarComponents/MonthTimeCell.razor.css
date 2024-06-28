@@ -1,0 +1,74 @@
+﻿.monthly-day {
+    border-bottom: 1px solid rgba(166, 168, 179, 0.12);
+    border-right: 1px solid rgba(166, 168, 179, 0.12);
+    text-align: right;
+    padding: 0.4vh 0.4vw;
+    letter-spacing: 1px;
+    font-size: 0.8em;
+    box-sizing: border-box;
+    color: #6d7377;
+    position: relative;
+}
+
+    .monthly-day:nth-of-type(n + 1):nth-of-type(-n + 7) {
+        grid-row: 2;
+    }
+
+    .monthly-day:nth-of-type(n + 8):nth-of-type(-n + 14) {
+        grid-row: 3;
+    }
+
+    .monthly-day:nth-of-type(n + 15):nth-of-type(-n + 21) {
+        grid-row: 4;
+    }
+
+    .monthly-day:nth-of-type(n + 22):nth-of-type(-n + 28) {
+        grid-row: 5;
+    }
+
+    .monthly-day:nth-of-type(n + 29):nth-of-type(-n + 35) {
+        grid-row: 6;
+    }
+
+    .monthly-day:nth-of-type(n + 36):nth-of-type(-n + 43) {
+        grid-row: 7;
+    }
+
+    .monthly-day:nth-of-type(7n + 1) {
+        grid-column: 1/1;
+    }
+
+    .monthly-day:nth-of-type(7n + 2) {
+        grid-column: 2/2;
+    }
+
+    .monthly-day:nth-of-type(7n + 3) {
+        grid-column: 3/3;
+    }
+
+    .monthly-day:nth-of-type(7n + 4) {
+        grid-column: 4/4;
+    }
+
+    .monthly-day:nth-of-type(7n + 5) {
+        grid-column: 5/5;
+    }
+
+    .monthly-day:nth-of-type(7n + 6) {
+        grid-column: 6/6;
+    }
+
+    .monthly-day:nth-of-type(7n + 7) {
+        grid-column: 7/7;
+    }
+
+.monthly-day--disabled {
+    color: rgba(#98a0a6, 0.6);
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f4f6f7' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.monthly-today {
+    border: 3px solid #f75959;
+    border-radius: 5px;
+}

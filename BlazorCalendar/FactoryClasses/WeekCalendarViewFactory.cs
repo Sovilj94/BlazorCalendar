@@ -18,7 +18,7 @@ namespace BlazorCalendar.FactoryClasses
             _tasksService = new TasksService();
         }
 
-        public ICalendarView CreateCalendarView(DateTime firstDate, TimeDivisionEnum timeDivision)
+        public ICalendarView CreateCalendarView(DateTime firstDate, TimeDivisionEnum timeDivision, List<ICalendarEvent> calendarEvents)
         {
             // Prvi i zadnji dan u sedmici
             var firstDayOfWeek = _culture.DateTimeFormat.FirstDayOfWeek;

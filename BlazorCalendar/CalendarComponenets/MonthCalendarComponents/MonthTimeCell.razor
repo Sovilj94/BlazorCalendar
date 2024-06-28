@@ -1,0 +1,69 @@
+﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.Interfaces
+@using BlazorCalendar.Models.MonthViewModels
+
+@inject ITaskDraggedService TaskDraggedService
+
+<div class="fade-in monthly-day @MonthTimeCellViewModel.CSSClass"
+     style="@MonthTimeCellViewModel.CSSbackground"
+     ondragover="event.preventDefault();"
+     @onclick="@((e) => ClickDayInternal(e, MonthTimeCellViewModel.DayCounter))"
+     @ondrop="@((e) => HandleDayOnDrop(MonthTimeCellViewModel.DayCounter))">
+    @if (MonthTimeCellViewModel.DayCounter != DateTime.MinValue)
+    {
+        @MonthTimeCellViewModel.DayCounter.Day
+    }
+</div>
+
+
+@code {
+
+    [Parameter]
+    public MonthTimeCellViewModel MonthTimeCellViewModel { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OutsideCurrentMonthClick { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
+
+    [Parameter]
+    public EventCallback<DragDropParameter> DropEvent { get; set; }
+
+    private Tasks TaskDragged => TaskDraggedService.TaskDragged;
+
+    [Parameter]
+    public bool Draggable { get; set; } = true;
+
+    private async Task ClickDayInternal(MouseEventArgs e, DateTime day)
+    {
+        if (!DayClick.HasDelegate)
+            return;
+
+        ClickEmptyDayParameter clickEmptyDayParameter = new()
+            {
+                Day = day,
+                X = e.ClientX,
+                Y = e.ClientY
+            };
+
+        await DayClick.InvokeAsync(clickEmptyDayParameter);
+    }
+
+    private async Task HandleDayOnDrop(DateTime day)
+    {
+        if (!Draggable)
+            return;
+
+        if (TaskDragged is null)
+            return;
+
+        DragDropParameter dragDropParameter = new()
+            {
+                Day = day,
+                taskID = TaskDragged.ID
+            };
+
+        await DropEvent.InvokeAsync(dragDropParameter);
+    }
+}

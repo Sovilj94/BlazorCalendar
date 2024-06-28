@@ -1,0 +1,91 @@
+﻿@using System.Globalization
+@using BlazorCalendar.FactoryClasses
+@using BlazorCalendar.Models
+@using BlazorCalendar.Models.Interfaces
+@using BlazorCalendar.Models.MonthViewModels
+@using BlazorCalendar.Styles
+
+@inherits CalendarBase
+@inject MonthCalendarViewFactory MonthCalendarViewFactory
+
+<div class="monthly-calendar" style="@Style">
+
+    @foreach (var montheHeaderViewModel in MonthCalendarViewModel.MonthHeaderViewModels)
+    {
+        <MonthDayHeader MonthDayHeaderViewModel="montheHeaderViewModel">
+        </MonthDayHeader>
+    }
+
+    @foreach (var monthTimeCellViewModel in MonthCalendarViewModel.MonthTimeCellViewModels)
+    {
+        <MonthTimeCell MonthTimeCellViewModel="monthTimeCellViewModel"
+                       DayClick="DayClick"
+                       DropEvent="DropEvent">
+        </MonthTimeCell>
+    }
+
+    @foreach (var monthGridItemViewModel in MonthCalendarViewModel.MonthGridItemViewModels)
+    {
+        <MonthGridItem MonthGridItemViewModel="monthGridItemViewModel"
+                       Draggable="Draggable"
+                       DragStart="DragStart"
+                       EventClick="EventClick">
+        </MonthGridItem>
+    }
+
+</div>
+
+<br />
+<div class="console">@fakeConsole</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        MonthCalendarViewModel = (MonthCalendarViewModel)CalendarViewModel;
+    }
+
+    protected override void OnParametersSet()
+    {
+        MonthCalendarViewModel = (MonthCalendarViewModel)CalendarViewModel;
+    }
+
+    private MonthCalendarViewModel MonthCalendarViewModel { get; set; }
+
+    [Parameter]
+    public ICalendarView CalendarViewModel { get; set; }
+
+    private string fakeConsole = "";
+
+    private void EventClick(ClickTaskParameter clickTaskParameter)
+    {
+        fakeConsole = "ID task(s) :" + string.Join(", ", clickTaskParameter.IDList);
+    }
+
+    private void DayClick(ClickEmptyDayParameter clickEmptyDayParameter)
+    {
+        fakeConsole = "Empty day :" + clickEmptyDayParameter.Day.ToShortDateString();
+    }
+
+    private void DragStart(DragDropParameter dragDropParameter)
+    {
+        fakeConsole = $"DragStart event : {dragDropParameter.taskID}";
+    }
+
+    private void DropEvent(DragDropParameter dragDropParameter)
+    {
+        var taskDropped = MonthCalendarViewModel.CalendarEvents.FirstOrDefault(t => t.ID == dragDropParameter.taskID);
+
+        if (taskDropped != null)
+        {
+            fakeConsole = $"DropTask event :{dragDropParameter.Day.ToShortDateString()} {dragDropParameter.taskID}";
+            var totalDays = (taskDropped.DateEnd - taskDropped.DateStart).TotalDays;
+            taskDropped.DateStart = dragDropParameter.Day;
+            taskDropped.DateEnd = dragDropParameter.Day.AddDays(totalDays);
+
+            // Recreate the calendar view with the updated events
+            MonthCalendarViewModel = (MonthCalendarViewModel)MonthCalendarViewFactory.CreateCalendarView(MonthCalendarViewModel.Date, TimeDivisionEnum.FifteenMinutes, MonthCalendarViewModel.CalendarEvents);
+
+            StateHasChanged();
+        }
+    }
+}

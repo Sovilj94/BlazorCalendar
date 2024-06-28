@@ -16,30 +16,30 @@ namespace BlazorCalendar.FactoryClasses
             _tasksService = new TasksService();
         }
 
-        public ICalendarView CreateCalendarView(DateTime firstDate, TimeDivisionEnum timeDivision)
+        public ICalendarView CreateCalendarView(DateTime today, TimeDivisionEnum timeDivision, List<ICalendarEvent> calendarEvents)
         {
             // Inicijalizacija view modela
             DayCalendarViewModel dayCalendarViewModel = new DayCalendarViewModel();
             dayCalendarViewModel.DayHeaderViewModel = new DayDayHeaderViewModel
             {
-                DayName = _dayNames[(int)firstDate.DayOfWeek],
-                DayDate = firstDate.ToString("dd.MM")
+                DayName = _dayNames[(int)today.DayOfWeek],
+                DayDate = today.ToString("dd.MM")
             };
 
             dayCalendarViewModel.AllDayViewModel = new DayAllDayViewModel
             {
                 Events = _tasksService.GetTasksForAllDayViewModel(_tasksService.GetAllTasks()),
-                FirstDateWeek = firstDate.Date,
+                FirstDateWeek = today.Date,
                 TimeCellViewModel = new DayTimeCellViewModel(),
                 GridItemsViewModel = new List<DayGridItemViewModel>()
             };
-            dayCalendarViewModel.AllDayViewModel.GridItemsViewModel = GetGridItemsForAllDayComponent(dayCalendarViewModel.AllDayViewModel.Events, firstDate.Date);
+            dayCalendarViewModel.AllDayViewModel.GridItemsViewModel = GetGridItemsForAllDayComponent(dayCalendarViewModel.AllDayViewModel.Events, today.Date);
 
             // TimeCells for AllDayViewModel
             DayTimeCellViewModel allDayTimeCell = new DayTimeCellViewModel
             {
                 IsAllDayTimesCell = true,
-                Time = firstDate,
+                Time = today,
                 Column = 1,
                 CSSGridPosition = $";grid-column-start:1; height:100px; border-right:1px solid #ccc"
             };
@@ -54,9 +54,9 @@ namespace BlazorCalendar.FactoryClasses
             // Main Day View
             dayCalendarViewModel.DayViewModel = new DayDayViewModel
             {
-                Day = firstDate,
+                Day = today,
                 TimeDivision = new TimeDivision(timeDivision),
-                GridItemsViewModel = GetGridItemsForDayComponent(_tasksService.GetTasksForDayViewModel(firstDate, _tasksService.GetAllTasks()), new TimeDivision(timeDivision).Minutes, firstDate),
+                GridItemsViewModel = GetGridItemsForDayComponent(_tasksService.GetTasksForDayViewModel(today, _tasksService.GetAllTasks()), new TimeDivision(timeDivision).Minutes, today),
                 TimeCellsViewModel = new List<DayTimeCellViewModel>(),
             };
 
@@ -90,7 +90,7 @@ namespace BlazorCalendar.FactoryClasses
                 dayCalendarViewModel.DayViewModel.TimeCellsViewModel.Add(timeCell);
             }
 
-            dayCalendarViewModel.Events = _tasksService.GetAllTasks().Where(e => e.DateStart.Date == firstDate.Date).ToList();
+            dayCalendarViewModel.Events = _tasksService.GetAllTasks().Where(e => e.DateStart.Date == today.Date).ToList();
 
             return dayCalendarViewModel;
         }

@@ -1,4 +1,5 @@
 ﻿@using System.Globalization
+@using BlazorCalendar.FactoryClasses
 @using BlazorCalendar.Models
 @using BlazorCalendar.Models.DayViewModels
 @using BlazorCalendar.Models.Interfaces
@@ -95,7 +96,7 @@
         droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
         droppedTask.DateStart = dragDropParameter.Day;
 
-        DayCalendarViewModel.DayViewModel.GridItemsViewModel = TasksService.GetGridItemsForDDayComponent(DayCalendarViewModel.Events, new TimeDivision(TimeDivisionEnum).Minutes,DayCalendarViewModel.DayViewModel.Day);
+        DayCalendarViewModel.DayViewModel.GridItemsViewModel = new DayCalendarViewFactory().GetGridItemsForDayComponent(DayCalendarViewModel.Events, new TimeDivision(TimeDivisionEnum).Minutes,DayCalendarViewModel.DayViewModel.Day);
 
         DayCalendarViewModel.DayViewModel.MaxNumberOfColumns = DayCalendarViewModel.DayViewModel.GridItemsViewModel.Max(z => z.ColumnStart);
 

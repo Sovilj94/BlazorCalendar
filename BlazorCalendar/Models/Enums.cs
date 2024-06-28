@@ -16,6 +16,13 @@ public enum DisplayedView
     Daily = 3
 }
 
+public enum StateCase
+{
+    Before = 0, // First empty cells part
+    InMonth = 1,
+    After = 2,
+}
+
 public enum FillStyleEnum
 {
     [Description("fill")]
