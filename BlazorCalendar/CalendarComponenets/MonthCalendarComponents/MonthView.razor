@@ -33,6 +33,14 @@
         </MonthGridItem>
     }
 
+    @foreach (var monthGridItemListViewModel in MonthCalendarViewModel.MonthGridItemsListViewModels)
+    {
+        <MonthGridItemList GridItemListViewModel="monthGridItemListViewModel"
+                       Draggable="Draggable"
+                       EventClick="EventClick">
+        </MonthGridItemList>
+    }
+
 </div>
 
 <br />

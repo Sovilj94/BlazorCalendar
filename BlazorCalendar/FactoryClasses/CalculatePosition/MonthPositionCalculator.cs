@@ -1,6 +1,9 @@
 ﻿using BlazorCalendar.Models.Interfaces;
 using BlazorCalendar.Models.MonthViewModels;
 using BlazorCalendar.Styles;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BlazorCalendar.FactoryClasses.CalculatePosition
 {
@@ -13,6 +16,7 @@ namespace BlazorCalendar.FactoryClasses.CalculatePosition
             if (eventList is not null)
             {
                 var occupiedPosition = new TaskPosition[32];
+                var eventCounter = new int[32]; // Track the number of events per day
                 for (int i = 0; i < 32; ++i)
                 {
                     occupiedPosition[i] = new TaskPosition();
@@ -24,9 +28,14 @@ namespace BlazorCalendar.FactoryClasses.CalculatePosition
                 bool onmMultiLine = false;
                 bool draggable = false;
 
-                for (var k = 0; k < eventList.Count; k++)
+                // Sort the events by start date first and then by duration (longest first)
+                var sortedEventList = eventList.OrderBy(e => e.DateStart.Date)
+                                               .ThenByDescending(e => (e.DateEnd.Date - e.DateStart.Date).TotalDays)
+                                               .ToList();
+
+                for (var k = 0; k < sortedEventList.Count; k++)
                 {
-                    ICalendarEvent t = eventList[k];
+                    ICalendarEvent t = sortedEventList[k];
 
                     if ((t.DateStart.Date <= firstDate && firstDate <= t.DateEnd.Date) ||
                         (t.DateStart.Date > firstDate && LastDay > t.DateEnd.Date) ||
@@ -44,36 +53,41 @@ namespace BlazorCalendar.FactoryClasses.CalculatePosition
                         classPosition = null;
 
                         TaskPosition position = occupiedPosition[Start.Day];
+                        bool positionFound = false;
 
-                        if (position.Top == false)
+                        for (int i = 0; i < 3 && !positionFound; i++)
                         {
-                            for (int i = Start.Day; i < Start.Day + s; ++i)
+                            bool canPlace = true;
+
+                            for (int j = Start.Day; j < Start.Day + s && canPlace; j++)
                             {
-                                occupiedPosition[i].Top = true;
+                                canPlace &= !(occupiedPosition[j].Top && i == 0) &&
+                                             !(occupiedPosition[j].Center && i == 1) &&
+                                             !(occupiedPosition[j].Bottom && i == 2);
                             }
-                            classPosition = "monthly-task-first";
-                        }
-                        else if (position.Center == false)
-                        {
-                            for (int i = Start.Day; i < Start.Day + s; ++i)
+
+                            if (canPlace)
                             {
-                                occupiedPosition[i].Center = true;
+                                positionFound = true;
+                                for (int j = Start.Day; j < Start.Day + s; j++)
+                                {
+                                    if (i == 0) occupiedPosition[j].Top = true;
+                                    else if (i == 1) occupiedPosition[j].Center = true;
+                                    else if (i == 2) occupiedPosition[j].Bottom = true;
+                                }
+
+                                classPosition = i == 0 ? "monthly-task-first" :
+                                                i == 1 ? "monthly-task-second" :
+                                                         "monthly-task-bottom";
                             }
-                            classPosition = "monthly-task-second";
-                        }
-                        else if (position.Bottom == false)
-                        {
-                            for (int i = Start.Day; i < Start.Day + s; ++i)
-                            {
-                                occupiedPosition[i].Bottom = true;
-                            }
-                            classPosition = "monthly-task-bottom";
                         }
 
                         string borderClass = "border-start";
                         do
                         {
                             string row = $"grid-column:{x} / span {s}; grid-row:{y};";
+
+                            viewModel.MonthGridItemsListViewModels = new List<MonthGridItemListViewModel>();
 
                             if (classPosition is not null)
                             {
@@ -100,16 +114,31 @@ namespace BlazorCalendar.FactoryClasses.CalculatePosition
                                     Event = t
                                 };
                                 viewModel.MonthGridItemViewModels.Add(gridItem);
+
+                                eventCounter[Start.Day]++; // Increment the event counter for the day
+
+                                // Check if more than 3 events and add placeholder
+                                if (eventCounter[Start.Day] > 3)
+                                {
+                                    viewModel.MonthGridItemViewModels.RemoveAll(g => g.Event.DateStart.Day == Start.Day && g.Event.DateEnd.Day == Start.Day);
+                                    MonthGridItemListViewModel placeholderItem = new MonthGridItemListViewModel
+                                    {
+                                        CSSGridPosition = $"grid-column:{x} / span 1; grid-row:{y};",
+                                        CSSClass = "fade-in monthly-more-tasks noselect",
+                                        EventCounter = eventCounter[Start.Day]
+                                    };
+                                    viewModel.MonthGridItemsListViewModels.Add(placeholderItem);
+                                }
                             }
                             else
                             {
-                                MonthGridItemViewModel gridItem = new MonthGridItemViewModel
+                                MonthGridItemListViewModel gridItem = new MonthGridItemListViewModel
                                 {
                                     CSSGridPosition = $"grid-column:{x} / span 1; grid-row:{y};",
                                     CSSClass = "fade-in monthly-more-tasks noselect",
-                                    Event = t
+                                    EventCounter = 1
                                 };
-                                viewModel.MonthGridItemViewModels.Add(gridItem);
+                                viewModel.MonthGridItemsListViewModels.Add(gridItem);
                             }
 
                             onmMultiLine = false;

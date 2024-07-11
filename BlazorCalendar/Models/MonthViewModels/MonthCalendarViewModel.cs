@@ -7,6 +7,7 @@ namespace BlazorCalendar.Models.MonthViewModels
         public List<MonthDayHeaderViewModel> MonthHeaderViewModels { get; set; }
         public List<MonthTimeCellViewModel> MonthTimeCellViewModels { get; set; }
         public List<MonthGridItemViewModel> MonthGridItemViewModels { get; set; }
+        public List<MonthGridItemListViewModel> MonthGridItemsListViewModels { get; set; }
         public List<ICalendarEvent> CalendarEvents { get; set; }
         public DateTime Date { get; set; }
     }

@@ -1,0 +1,49 @@
+﻿@using BlazorCalendar.Models
+@using BlazorCalendar.Models.Interfaces
+@using BlazorCalendar.Models.MonthViewModels
+
+@inject ITaskDraggedService TaskDraggedService
+
+<div class=$"@GridItemListViewModel.CSSClass"
+     style="@GridItemListViewModel.CSSGridPosition; @GridItemListViewModel.GridItemColor"
+     draggable="@Draggable.ToString()"
+     @onclick="e => ClickEventInternal(e, GridItemListViewModel.GridItemsViewModel, GridItemListViewModel.Day)">
+    @NumberOfAdditionalEvents
+</div>
+
+@code {
+    [Parameter]
+    public MonthGridItemListViewModel GridItemListViewModel { get; set; }
+
+    [Parameter]
+    public int NumberOfAdditionalEvents { get; set; } = 2;
+
+    [Parameter]
+    public bool Draggable { get; set; }
+
+    [Parameter]
+    public EventCallback<ClickTaskParameter> EventClick { get; set; }
+
+    private async Task ClickEventInternal(MouseEventArgs e, List<MonthGridItemViewModel> items, DateTime day)
+    {
+        if (!EventClick.HasDelegate)
+            return;
+
+        List<int> listID = new();
+
+        foreach (var item in items)
+        {
+            listID.Add(item.Event.ID);
+        }
+
+        ClickTaskParameter clickTaskParameter = new()
+            {
+                IDList = listID,
+                X = e.ClientX,
+                Y = e.ClientY,
+                Day = day
+            };
+
+        await EventClick.InvokeAsync(clickTaskParameter);
+    }
+}
