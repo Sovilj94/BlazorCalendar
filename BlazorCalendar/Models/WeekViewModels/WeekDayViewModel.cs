@@ -13,7 +13,7 @@ namespace BlazorCalendar.Models.WeekViewModels
 
         public DateTime Day { get; set; }
 
-        public string WeekDaysColor { get; set; } = "#FFF";
+        public string WeekDaysColor { get; set; } = "#f8f9fa";
 
         public string SaturdayColor { get; set; } = "#ECF4FD";
 

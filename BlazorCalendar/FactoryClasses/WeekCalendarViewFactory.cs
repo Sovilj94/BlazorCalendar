@@ -47,8 +47,8 @@ namespace BlazorCalendar.FactoryClasses
                 timeCell.IsAllDayTimesCell = true;
                 timeCell.Time = weekCalendarViewModel.AllDay.FirstDateWeek.AddDays(column);
                 timeCell.Column = column + 2;
-                timeCell.CSSGridPosition = $"grid-row:1 / span 5; grid-column-start:{column + 2}; height:100px; border-right:1px solid #ccc";
-
+                timeCell.CSSGridPosition = $"grid-row:1 / span 5; grid-column-start:{column + 2};";
+                timeCell.RowsSpan = weekCalendarViewModel.AllDay.GridItems?.Max(x => x?.RowStart);
                 weekCalendarViewModel.AllDay.TimeCells.Add(timeCell);
             }
 

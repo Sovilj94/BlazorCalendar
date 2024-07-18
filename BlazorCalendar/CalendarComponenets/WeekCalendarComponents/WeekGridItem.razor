@@ -1,13 +1,16 @@
 ﻿@using BlazorCalendar.Models
 @using BlazorCalendar.Models.Interfaces
 @using BlazorCalendar.Models.WeekViewModels
+@using Microsoft.JSInterop
 
 @inject ITaskDraggedService TaskDraggedService
+@inject IJSRuntime JS
 
-<div class="@($"hour-task {GridItemViewModel.ClassPin}{GridItemViewModel.ClassPointer} border-start border-top border-bottom")"
+<div id="@($"dragElement-{GridItemViewModel.Event.ID}")" class="@($"hour-task {GridItemViewModel.ClassPin}{GridItemViewModel.ClassPointer} border-start border-top border-bottom")"
      style="@GridItemViewModel.CSSGridPosition @GridItemViewModel.EventColor"
      draggable="@Draggable.ToString()"
-     @ondragstart="(e) => HandleDragStart(GridItemViewModel.Event.ID)"
+     @ondragstart="@(async (e) => await HandleDragStart(e, GridItemViewModel.Event.ID))"
+     @ondragend="@(async (e) => await HandleDragEnd(e, GridItemViewModel.Event.ID))"
      @onclick="e => ClickEventInternal(e, GridItemViewModel.Event.ID, GridItemViewModel.Day)">
     @GridItemViewModel.Event.Code
 </div>
@@ -25,9 +28,8 @@
     [Parameter]
     public EventCallback<ClickTaskParameter> EventClick { get; set; }
 
-    private async Task HandleDragStart(int taskID)
+    private async Task HandleDragStart(DragEventArgs e, int taskID)
     {
-
         TaskDraggedService.TaskDragged = new Tasks()
             {
                 ID = taskID
@@ -39,6 +41,15 @@
             };
 
         await DragStart.InvokeAsync(dragDropParameter);
+
+        // Add dragging class
+        await JS.InvokeVoidAsync("addClass", $"dragElement-{taskID}", "dragging");
+    }
+
+    private async Task HandleDragEnd(DragEventArgs e, int taskID)
+    {
+        // Remove dragging class
+        await JS.InvokeVoidAsync("removeClass", $"dragElement-{taskID}", "dragging");
     }
 
     private async Task ClickEventInternal(MouseEventArgs e, int taskID, DateTime day)

@@ -10,7 +10,6 @@ public enum PriorityLabel
 
 public enum DisplayedView
 {
-    Annual = 0,
     Monthly = 1,
     Weekly = 2,
     Daily = 3

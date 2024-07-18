@@ -1,20 +1,40 @@
-﻿<div class="calendar-nav-bar d-flex flex-row mb-2">
-    <button type="button" @onclick="GoToday" class="btn">📅 Go Today</button>
-    <button type="button" @onclick="@(async () => await Navigate(-Skip()))" class="btn">🔼</button>
-    <button type="button" @onclick="@(async () => await Navigate(Skip()))" class="btn me-2">🔽</button>
-    <input type="date" class="me-2" value="@(FirstDate.ToString("yyyy-MM-dd"))" @onchange="@(async e => await ChangeFirstDate(e.Value.ToString()))" />
+﻿<div class="calendar-nav-bar mb-2">
+    <div class="btn-group">
+        <button type="button" @onclick="GoToday" class="btn btn-outline-secondary nav-btn">📅 Go Today</button>
+        <button type="button" @onclick="@(async () => await Navigate(-Skip()))" class="btn btn-outline-secondary nav-btn">🔼</button>
+        <button type="button" @onclick="@(async () => await Navigate(Skip()))" class="btn btn-outline-secondary nav-btn">🔽</button>
+    </div>
 
-    <select @onchange="TimeDivisionChanged" class="me-2">
-        <option value="@TimeDivisionEnum.TwoHours">Two Hours</option>
-        <option selected value="@TimeDivisionEnum.Hour">Hour</option>
-        <option value="@TimeDivisionEnum.ThirtyMinutes">Thirty Minutes</option>
-        <option value="@TimeDivisionEnum.FifteenMinutes">Fifteen Minutes</option>
-    </select>
+    <div class="selects-and-date">
+        <div class="mb-2" style="margin-right:5px">
+            <select class="form-select form-select-sm nav-select" aria-label=".form-select-sm example" @onchange="SelectedViewTypeChanged">
+                <option value="@DisplayedView.Monthly">Monthly View</option>
+                <option selected value="@DisplayedView.Weekly">Weekly View</option>
+                <option value="@DisplayedView.Daily">Daily View</option>
+            </select>
+        </div>
+
+        <div class="mb-2" style="margin-right:5px">
+            <select class="form-select form-select-sm nav-select" aria-label=".form-select-sm example" @onchange="TimeDivisionChanged">
+                <option value="@TimeDivisionEnum.TwoHours">Two Hours</option>
+                <option selected value="@TimeDivisionEnum.Hour">Hour</option>
+                <option value="@TimeDivisionEnum.ThirtyMinutes">Thirty Minutes</option>
+                <option value="@TimeDivisionEnum.FifteenMinutes">Fifteen Minutes</option>
+            </select>
+        </div>
+
+        <div class="mb-2" style="margin-right:5px">
+            <input type="date" class="form-control nav-input" value="@(FirstDate.ToString("yyyy-MM-dd"))" @onchange="@(async e => await ChangeFirstDate(e.Value.ToString()))" />
+        </div>
+    </div>
 </div>
 
+
 @code {
+    private DisplayedView SelectedViewType = DisplayedView.Weekly;
+
     [Parameter]
-    public DisplayedView SelectedViewType { get; set; }
+    public EventCallback<DisplayedView> ClickSelectedViewType { get; set; }
 
     [Parameter]
     public EventCallback<int> ClicMonthNavigate { get; set; }
@@ -49,11 +69,11 @@
 
     private async Task Navigate(int daysToAdd)
     {
-        if(SelectedViewType == DisplayedView.Weekly || SelectedViewType == DisplayedView.Daily)
-        FirstDate = FirstDate.AddDays(daysToAdd);
+        if (SelectedViewType == DisplayedView.Weekly || SelectedViewType == DisplayedView.Daily)
+            FirstDate = FirstDate.AddDays(daysToAdd);
 
-        if(SelectedViewType == DisplayedView.Monthly)
-        FirstDate = FirstDate.AddMonths(daysToAdd);
+        if (SelectedViewType == DisplayedView.Monthly)
+            FirstDate = FirstDate.AddMonths(daysToAdd);
 
         await ClicMonthNavigate.InvokeAsync(daysToAdd);
         await FirstDateCallBack.InvokeAsync(FirstDate.ToString("yyyy-MM-dd"));
@@ -76,6 +96,16 @@
         {
             TimeDivisionEnum = newValue;
             return ClickTimeDivision.InvokeAsync(TimeDivisionEnum);
+        }
+        return Task.CompletedTask;
+    }
+
+    private Task SelectedViewTypeChanged(ChangeEventArgs e)
+    {
+        if (Enum.TryParse(e.Value.ToString(), out DisplayedView newValue))
+        {
+            SelectedViewType = newValue;
+            return ClickSelectedViewType.InvokeAsync(SelectedViewType);
         }
         return Task.CompletedTask;
     }

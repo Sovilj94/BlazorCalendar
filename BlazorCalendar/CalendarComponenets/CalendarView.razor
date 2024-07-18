@@ -13,34 +13,39 @@
 @inject CalendarViewFactoryProvider CalendarViewFactoryProvider
 @inject TasksService TasksService
 
-<CalendarNavigation SelectedViewType="SelectedViewType"
-                    ClicMonthNavigate="ClicMonthNavigate"
-                    FirstDateCallBack="ChangeFirstDate"
-                    GoTodayCallBack="GoToday"
-                    ClickTimeDivision="HandleTimeDivisionChanged">
-</CalendarNavigation>
 
-@if (SelectedViewType == DisplayedView.Weekly)
-{
-    <WeekView Draggable="Draggable"
-              HighlightToday="true"
-              TimeDivisionEnum="TimeDivisionEnum"
-              CalendarViewModel="CalendarViewModel">
-    </WeekView>
-}
-else if (SelectedViewType == DisplayedView.Daily)
-{
-    <DayView Draggable="Draggable"
-             TimeDivisionEnum="TimeDivisionEnum"
-             CalendarViewModel="CalendarViewModel">
-    </DayView>
-}
-else if (SelectedViewType == DisplayedView.Monthly)
-{
-    <MonthView CalendarViewModel="CalendarViewModel"
-               Draggable="Draggable">
-    </MonthView>
-}
+
+<div class="flex-container">
+    <CalendarNavigation ClickSelectedViewType="ClickSelectedViewType"
+                        ClicMonthNavigate="ClicMonthNavigate"
+                        FirstDateCallBack="ChangeFirstDate"
+                        GoTodayCallBack="GoToday"
+                        ClickTimeDivision="HandleTimeDivisionChanged">
+    </CalendarNavigation>
+
+    @if (SelectedViewType == DisplayedView.Weekly)
+    {
+        <WeekView Draggable="Draggable"
+                  HighlightToday="true"
+                  TimeDivisionEnum="TimeDivisionEnum"
+                  CalendarViewModel="CalendarViewModel">
+        </WeekView>
+    }
+
+    else if (SelectedViewType == DisplayedView.Daily)
+    {
+        <DayView Draggable="Draggable"
+                 TimeDivisionEnum="TimeDivisionEnum"
+                 CalendarViewModel="CalendarViewModel">
+        </DayView>
+    }
+    else if (SelectedViewType == DisplayedView.Monthly)
+    {
+        <MonthView CalendarViewModel="CalendarViewModel"
+                   Draggable="Draggable">
+        </MonthView>
+    }
+</div>
 
 @code {
     public DateTime FirstDate { get; set; }
@@ -49,8 +54,7 @@ else if (SelectedViewType == DisplayedView.Monthly)
 
     public ICalendarView CalendarViewModel { get; set; }
 
-    [Parameter]
-    public DisplayedView SelectedViewType { get; set; }
+    public DisplayedView SelectedViewType { get; set; } = DisplayedView.Weekly;
 
     protected override void OnInitialized()
     {
@@ -100,6 +104,13 @@ else if (SelectedViewType == DisplayedView.Monthly)
     private Task HandleTimeDivisionChanged(TimeDivisionEnum newTimeDivision)
     {
         TimeDivisionEnum = newTimeDivision;
+        RefreshCalendarModel();
+        return Task.CompletedTask;
+    }
+
+    private Task ClickSelectedViewType(DisplayedView viewType)
+    {
+        SelectedViewType = viewType;
         RefreshCalendarModel();
         return Task.CompletedTask;
     }

@@ -1,3 +1,37 @@
 ﻿.calendar-nav-bar {
-    justify-content:center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 70%;
+    margin: 0 auto;
+    background-color: #f0f0f0; /* Example background color */
+    padding: 10px; /* Adjust padding as needed */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Example box shadow */
+}
+
+.btn-group {
+    display: flex;
+}
+
+.nav-btn {
+    margin-right: 10px; /* Adjust spacing between buttons */
+}
+
+.selects-and-date {
+    display: flex;
+    align-items: center;
+}
+
+.nav-select, .nav-input {
+    padding: 8px; /* Adjust padding for selects and input */
+    border: 1px solid #ccc; /* Example border */
+    border-radius: 4px; /* Rounded corners */
+    font-size: 14px; /* Example font size */
+    background-color: white; /* Example background color */
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); /* Example inset box shadow */
+}
+
+.nav-select {
+    min-width: 150px; /* Minimum width for selects */
 }

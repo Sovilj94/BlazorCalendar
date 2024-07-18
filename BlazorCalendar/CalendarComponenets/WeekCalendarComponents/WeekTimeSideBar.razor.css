@@ -5,6 +5,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    background-color: #e9ecef;
 }
 .day-column{
     display: flex;

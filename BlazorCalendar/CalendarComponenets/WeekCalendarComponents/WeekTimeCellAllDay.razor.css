@@ -2,6 +2,11 @@
     grid-column-start: 1;
     font-size: 0.8em;
     padding-left: 0.6em;
-    height: 100px;
     border: 1px solid #ccc;
+    background: #f8f9fa;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.all-day-hour:hover {
+    background-color: #f0f0f0 !important;
 }

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 partial class AnnualView : CalendarBase
 {
     [CascadingParameter(Name = "SelectedView")]
-    public DisplayedView DisplayedView { get; set; } = DisplayedView.Annual;
+    public DisplayedView DisplayedView { get; set; }
 
     private int _months = 11;
     [Parameter]

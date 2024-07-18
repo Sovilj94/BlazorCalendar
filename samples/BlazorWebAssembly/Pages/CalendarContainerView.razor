@@ -8,21 +8,10 @@
 @using BlazorCalendar.Models.Interfaces
 @using BlazorCalendar.Services
 
-@inject TasksService TasksService
 
-<div class="calendar-nav-bar d-flex flex-row mb-2 justify-content-center">
-    <select @bind="SelectedViewType" class="me-2">
-        <option value="@DisplayedView.Annual">Annual View</option>
-        <option value="@DisplayedView.Monthly">Monthly View</option>
-        <option value="@DisplayedView.Weekly">Weekly View</option>
-        <option value="@DisplayedView.Daily">Daily View</option>
-    </select>
-</div>
-
-<CalendarView SelectedViewType="SelectedViewType">
+<CalendarView>
 </CalendarView>
 
-
 @code {
-    private DisplayedView SelectedViewType = DisplayedView.Monthly;
+    private DisplayedView SelectedViewType = DisplayedView.Weekly;
 }

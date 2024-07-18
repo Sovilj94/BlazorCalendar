@@ -3,12 +3,11 @@
 @using BlazorCalendar.Styles
 @using BlazorCalendar.CalendarComponenets
 
-
 <div class="all-day-grid allDay-column">
-    <div class="title" style="grid-row-start: 1; grid-column-start: 1; font-size:small">All day</div>
+    <div class="title" style="grid-row: 1 / span 7; grid-column-start: 1; font-size:small"></div>
     @foreach (var timeCellViewModel in AllDayViewModel.TimeCells)
     {
-            <WeekTimeCellAllDay DayClick="DayClick"
+        <WeekTimeCellAllDay DayClick="DayClick"
                       Draggable="Draggable"
                       DropEventOnAllDay="DropEventOnAllDay"
                       TimeCellViewModel="timeCellViewModel">
@@ -17,9 +16,9 @@
 
     @if (AllDayViewModel.GridItems is not null && AllDayViewModel.GridItems.Count != 0)
     {
-        @foreach (var item in AllDayViewModel.GridItems)
+        @foreach (var gridItem in AllDayViewModel.GridItems)
         {
-            <WeekGridItem GridItemViewModel="item"
+            <WeekGridItem GridItemViewModel="gridItem"
                       Draggable="Draggable"
                       DragStart="DragStart"
                       EventClick="EventClick">
@@ -27,8 +26,8 @@
         }
     }
 </div>
-@code {
 
+@code {
     [Parameter]
     public WeekAllDayViewModel AllDayViewModel { get; set; }
 

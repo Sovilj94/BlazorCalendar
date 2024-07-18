@@ -4,7 +4,6 @@
 <div class="d-flex flex-row mb-2">
 
 	<select @bind="@SelectedView" class="me-2">
-		<option value="@DisplayedView.Annual" selected>Annual view</option>
 		<option value="@DisplayedView.Monthly">Monthly view</option>
 		<option value="@DisplayedView.Weekly">Weeky view</option>
 	</select>
@@ -18,7 +17,7 @@
 </CalendarContainer>
 
 @code{
-	private BlazorCalendar.DisplayedView SelectedView = DisplayedView.Annual;
+	private BlazorCalendar.DisplayedView SelectedView;
 	private string HeaderStyle = "cursor:pointer";
 
 	private void HeaderClick(DateTime monthclicked)

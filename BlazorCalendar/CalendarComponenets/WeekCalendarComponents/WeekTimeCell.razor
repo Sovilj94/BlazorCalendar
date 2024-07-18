@@ -3,9 +3,12 @@
 
 @inject ITaskDraggedService TaskDraggedService
 
-<div class="hour day-cellule noselect"
-     ondragover="event.preventDefault();this.style.fontWeight = '600';"
+<div id="dropZone" class="hour day-cellule"
      ondragleave="this.style.fontWeight='100';"
+     @ondragenter:preventDefault="true"
+     @ondragenter="HandleDragEnter"
+     @ondragover:preventDefault="true"
+     @ondragover="HandleDragOver"
      @ondrop:preventDefault="true"
      @ondrop="() => HandleDayOnDrop(TimeCellViewModel.Time)"
      @onclick="e => ClickDayInternal(e, TimeCellViewModel.Time)"
@@ -29,6 +32,19 @@
     public EventCallback<ClickEmptyDayParameter> DayClick { get; set; }
 
     private Tasks TaskDragged => TaskDraggedService.TaskDragged;
+
+    private bool isDragOver = false;
+
+    private void HandleDragOver(DragEventArgs e)
+    {
+        e.DataTransfer.DropEffect = "move"; // Specify the drop effect (e.g., move, copy, link)
+    }
+
+    private void HandleDragEnter(DragEventArgs e)
+    {
+        isDragOver = true;
+        StateHasChanged();
+    }
 
     private async Task HandleDayOnDrop(DateTime day)
     {

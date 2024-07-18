@@ -5,3 +5,15 @@
     height: 24px;
     border-bottom: 1px solid #ccc;
 }
+
+#dropZone {
+    transition: background-color 0.3s ease-in-out;
+}
+
+    #dropZone:hover {
+        background-color: #f0f0f0 !important; /* Example of color change animation */
+    }
+
+.hour:hover {
+    background-color: #f0f0f0 !important;
+}
