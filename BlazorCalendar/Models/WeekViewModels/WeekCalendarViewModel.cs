@@ -13,5 +13,7 @@ namespace BlazorCalendar.Models.WeekViewModels
         public WeekTimeSideBarViewModel TimeSideBar { get; set; }
 
         public List<ICalendarEvent> Tasks { get; set; }
+
+        public DateTime Date { get; set; }
     }
 }

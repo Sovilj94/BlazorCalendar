@@ -8,6 +8,7 @@
 
 @inherits CalendarBase
 @inject TasksService TasksService
+@inject WeekCalendarViewFactory WeekCalendarViewFactory
 
 <div class="weekly-calendar" style="@Style">
 
@@ -124,7 +125,7 @@
             droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
             droppedTask.DateStart = dragDropParameter.Day;
 
-            WeekCalendarViewModel.AllDay.GridItems = new WeekCalendarViewFactory().GetGridItemsForAllDayComponent(WeekCalendarViewModel.AllDay.Events, WeekCalendarViewModel.AllDay.FirstDateWeek);
+            WeekCalendarViewModel = (WeekCalendarViewModel)WeekCalendarViewFactory.CreateCalendarView(WeekCalendarViewModel.Date, TimeDivisionEnum, WeekCalendarViewModel.AllDay.Events);
         }
     }
 }

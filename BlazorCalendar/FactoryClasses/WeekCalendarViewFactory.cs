@@ -1,4 +1,5 @@
-﻿using BlazorCalendar.Models;
+﻿using BlazorCalendar.FactoryClasses.CalculatePosition;
+using BlazorCalendar.Models;
 using BlazorCalendar.Models.Interfaces;
 using BlazorCalendar.Models.WeekViewModels;
 using BlazorCalendar.Services;
@@ -27,6 +28,8 @@ namespace BlazorCalendar.FactoryClasses
 
             // Inicijalizacija view modela
             WeekCalendarViewModel weekCalendarViewModel = new WeekCalendarViewModel();
+            weekCalendarViewModel.Date = firstDateWeek;
+
             weekCalendarViewModel.DayHeader = new List<WeekDayHeaderViewModel>();
             weekCalendarViewModel.AllDay = new WeekAllDayViewModel();
             weekCalendarViewModel.TimeSideBar = new WeekTimeSideBarViewModel();
@@ -34,12 +37,11 @@ namespace BlazorCalendar.FactoryClasses
             weekCalendarViewModel.Tasks = _tasksService.GetTasksForWeekViewModel(firstDateWeek, lastDateOfWeek, _tasksService.GetAllTasks());
 
             // Popunjavanje AllDayViewModela
-            weekCalendarViewModel.AllDay.Events = _tasksService.GetTasksForAllDayViewModel(_tasksService.GetAllTasks());
+            weekCalendarViewModel.AllDay.Events = calendarEvents; //_tasksService.GetTasksForAllDayViewModel(_tasksService.GetAllTasks());
             weekCalendarViewModel.AllDay.FirstDateWeek = firstDateWeek;
             weekCalendarViewModel.AllDay.TimeCells = new List<WeekTimeCellViewModel>();
             weekCalendarViewModel.AllDay.GridItems = new List<WeekGridItemViewModel>();
-            weekCalendarViewModel.AllDay.GridItems = GetGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Events, firstDateWeek);
-
+            weekCalendarViewModel.AllDay.GridItems = new WeekPositionCalculator().CalculateGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Events, firstDateWeek); //GetGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Events, firstDateWeek);
             // TimeCells
             for (int column = 0; column < 7; column++)
             {
