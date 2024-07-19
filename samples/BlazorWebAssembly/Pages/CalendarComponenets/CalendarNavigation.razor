@@ -1,4 +1,5 @@
-﻿<div class="calendar-nav-bar mb-2">
+﻿@using BlazorCalendar
+<div class="calendar-nav-bar mb-2">
     <div class="btn-group">
         <button type="button" @onclick="GoToday" class="btn btn-outline-secondary nav-btn">📅 Go Today</button>
         <button type="button" @onclick="@(async () => await Navigate(-Skip()))" class="btn btn-outline-secondary nav-btn">🔼</button>

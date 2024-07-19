@@ -1,12 +1,13 @@
-﻿@using BlazorCalendar.FactoryClasses
+﻿@using BlazorCalendar
+@using BlazorCalendar.FactoryClasses
 @using BlazorCalendar.Models
 @using BlazorCalendar.Models.WeekViewModels
 @using BlazorCalendar.Models.Interfaces
 @using System.Globalization
 @using BlazorCalendar.Services
-@using BlazorCalendar.CalendarComponenets.WeekCalendarComponents
-@using BlazorCalendar.CalendarComponenets.DayCalendarComponents
-@using BlazorCalendar.CalendarComponenets.MonthCalendarComponents
+@using BlazorWebAssembly.Pages.CalendarComponenets.DayCalendarComponents
+@using BlazorWebAssembly.Pages.CalendarComponenets.MonthCalendarComponents
+@using BlazorWebAssembly.Pages.CalendarComponenets.WeekCalendarComponents
 
 @inherits CalendarBase
 
@@ -41,8 +42,7 @@
     }
     else if (SelectedViewType == DisplayedView.Monthly)
     {
-        <MonthView CalendarViewModel="CalendarViewModel"
-                   Draggable="Draggable">
+        <MonthView CalendarViewModel="CalendarViewModel">
         </MonthView>
     }
 </div>

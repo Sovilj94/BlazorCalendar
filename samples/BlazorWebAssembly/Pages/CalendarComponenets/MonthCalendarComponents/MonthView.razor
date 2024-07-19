@@ -1,14 +1,14 @@
 ﻿@using System.Globalization
+@using BlazorCalendar
 @using BlazorCalendar.FactoryClasses
 @using BlazorCalendar.Models
 @using BlazorCalendar.Models.Interfaces
 @using BlazorCalendar.Models.MonthViewModels
 @using BlazorCalendar.Styles
 
-@inherits CalendarBase
 @inject MonthCalendarViewFactory MonthCalendarViewFactory
 
-<div class="monthly-calendar" style="@Style">
+<div class="monthly-calendar">
 
     @foreach (var montheHeaderViewModel in MonthCalendarViewModel.MonthHeaderViewModels)
     {
@@ -27,7 +27,7 @@
     @foreach (var monthGridItemViewModel in MonthCalendarViewModel.MonthGridItemViewModels)
     {
         <MonthGridItem MonthGridItemViewModel="monthGridItemViewModel"
-                       Draggable="Draggable"
+                       Draggable="true"
                        DragStart="DragStart"
                        EventClick="EventClick">
         </MonthGridItem>
@@ -36,7 +36,7 @@
     @foreach (var monthGridItemListViewModel in MonthCalendarViewModel.MonthGridItemsListViewModels)
     {
         <MonthGridItemList GridItemListViewModel="monthGridItemListViewModel"
-                           Draggable="Draggable"
+                           Draggable="true"
                            EventClick="EventClick">
         </MonthGridItemList>
     } 

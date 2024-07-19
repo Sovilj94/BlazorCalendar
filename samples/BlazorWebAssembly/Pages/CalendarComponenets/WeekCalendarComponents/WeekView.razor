@@ -1,16 +1,19 @@
 ﻿@using System.Globalization
+@using BlazorCalendar
 @using BlazorCalendar.FactoryClasses
 @using BlazorCalendar.Models
 @using BlazorCalendar.Models.WeekViewModels
 @using BlazorCalendar.Models.Interfaces
 @using BlazorCalendar.Services
 @using BlazorCalendar.Styles
+@using BlazorWebAssembly.Pages.DialogComponent
 @using Microsoft.JSInterop
 
 @inherits CalendarBase
 @inject TasksService TasksService
 @inject WeekCalendarViewFactory WeekCalendarViewFactory
 @inject IJSRuntime JSRuntime
+@inject IDialogService DialogService
 
 <div class="weekly-calendar" style="@Style">
 
@@ -80,10 +83,10 @@
         fakeConsole = "ID Event(s) :" + string.Join(", ", clickTaskParameter.IDList);
     }
 
-    private void DayClick(ClickEmptyDayParameter clickEmptyDayParameter)
+    private async void DayClick(ClickEmptyDayParameter clickEmptyDayParameter)
     {
         fakeConsole = $"Empty day :{clickEmptyDayParameter.Day.ToShortDateString()}  {clickEmptyDayParameter.Day.ToShortTimeString()}";
-
+       await OpenDialogAsync();
 
     }
 
@@ -127,4 +130,49 @@
             WeekCalendarViewModel = (WeekCalendarViewModel)new WeekCalendarViewFactory().CreateCalendarView(WeekCalendarViewModel.Date, TimeDivisionEnum, WeekCalendarViewModel.AllDay.Events);
         }
     }
+
+    private bool _trapFocus = true;
+    private bool _modal = true;
+
+    SimplePerson simplePerson = new()
+        {
+            Firstname = "Dan",
+            Lastname = "Sanderson",
+            Age = 42,
+        };
+
+    private async Task OpenDialogAsync()
+    {
+
+        DialogParameters parameters = new()
+            {
+                Title = $"Hello {simplePerson.Firstname}",
+                PrimaryAction = "Yes",
+                PrimaryActionEnabled = false,
+                SecondaryAction = "No",
+                Width = "500px",
+                TrapFocus = _trapFocus,
+                Modal = _modal,
+                PreventScroll = true
+            };
+
+        IDialogReference dialog = await DialogService.ShowDialogAsync<HourClickDialog>(simplePerson, parameters);
+        DialogResult? result = await dialog.Result;
+
+
+        if (result.Data is not null)
+        {
+            SimplePerson? simplePerson = result.Data as SimplePerson;
+        }
+        else
+        {
+        }
+    }
+
+    public class SimplePerson
+        {
+            public string Firstname; 
+            public string Lastname ;
+            public int Age;
+        }
 }

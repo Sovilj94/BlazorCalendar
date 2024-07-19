@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFrameworks>net8.0</TargetFrameworks>
@@ -12,6 +12,14 @@
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons">
       <Version>4.9.2</Version>
     </PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Pages\CalendarComponenets\DayCalendarComponents\DayView.razor.css" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Pages\CalendarComponenets\DayCalendarComponents\DayView.razor.css" />
 	</ItemGroup>
 
 	<ItemGroup>

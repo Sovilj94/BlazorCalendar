@@ -23,15 +23,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="CalendarComponenets\DayCalendarComponents\DayView.razor.css" />
-	  <None Remove="CalendarComponenets\DayColumnVM.razor.css" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Include="CalendarComponenets\DayCalendarComponents\DayView.razor.css" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Include="wwwroot\BlazorCalendar.css" />
 	</ItemGroup>
 
