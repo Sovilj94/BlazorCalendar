@@ -131,38 +131,47 @@ namespace BlazorCalendar.FactoryClasses.CalculatePosition
             CalculatePositionsForAllDayComponent(gridItems, firstDateOfWeek);
             return gridItems;
         }
-
         public void CalculatePositionsForDayComponent(List<WeekGridItemViewModel> gridItems, int minutes, DateTime day)
         {
-            var gridItemsGroupedByDate = gridItems.GroupBy(t => t.Day.Date).ToList();
+            var gridItemsInDay = gridItems.OrderBy(t => t.RowStart).ThenBy(t => t.RowEnd).ToList();
+            List<List<int>> occupiedColumns = new List<List<int>>();
+            int totalRows = 24 * 60 / minutes; // Assuming a 24-hour day
 
-            foreach (var group in gridItemsGroupedByDate)
+            for (int i = 0; i < totalRows; i++)
             {
-                var gridItemsInDay = group.OrderBy(t => t.RowStart).ThenBy(t => t.RowEnd).ToList();
+                occupiedColumns.Add(new List<int>());
+            }
 
-                for (int i = 0; i < gridItemsInDay.Count; i++)
+            foreach (var gridItem in gridItemsInDay)
+            {
+                int column = 1;
+                bool foundColumn = false;
+
+                while (!foundColumn)
                 {
-                    var currentGridItem = gridItemsInDay[i];
-                    currentGridItem.ColumnStart = 1;
-
-                    for (int j = 0; j < i; j++)
+                    foundColumn = true;
+                    for (int row = gridItem.RowStart - 1; row < gridItem.RowEnd - 1; row++)
                     {
-                        var previousGridItem = gridItemsInDay[j];
-
-                        if (currentGridItem.RowStart < previousGridItem.RowEnd && currentGridItem.RowEnd > previousGridItem.RowStart)
+                        if (occupiedColumns[row].Contains(column))
                         {
-                            currentGridItem.ColumnStart = Math.Max(currentGridItem.ColumnStart, previousGridItem.ColumnStart + 1);
+                            foundColumn = false;
+                            column++;
+                            break;
                         }
                     }
                 }
-            }
 
-            foreach (var grItem in gridItems)
-            {
-                string gridRow = $"grid-row: {grItem.RowStart} / span {grItem.RowEnd - grItem.RowStart};";
-                string gridColumn = $"grid-column-start: {grItem.ColumnStart};";
-                string CSSGridPosition = $"{gridRow} {gridColumn}";
-                grItem.CSSGridPosition = CSSGridPosition;
+                gridItem.ColumnStart = column;
+
+                // Mark the occupied columns
+                for (int row = gridItem.RowStart - 1; row < gridItem.RowEnd - 1; row++)
+                {
+                    occupiedColumns[row].Add(column);
+                }
+
+                string gridRow = $"grid-row: {gridItem.RowStart} / span {gridItem.RowEnd - gridItem.RowStart};";
+                string gridColumn = $"grid-column-start: {gridItem.ColumnStart};";
+                gridItem.CSSGridPosition = $"{gridRow} {gridColumn}";
             }
         }
 

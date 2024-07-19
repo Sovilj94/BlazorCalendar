@@ -17,3 +17,11 @@
 .hour:hover {
     background-color: #f0f0f0 !important;
 }
+.hour {
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    padding: 5px;
+    text-align: right;
+    font-size: 0.8em;
+    color: #6c757d;
+}

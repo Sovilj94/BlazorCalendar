@@ -22,3 +22,24 @@
     background: #E6E6FA;
     display: grid;
 }
+
+.hour-grid {
+    display: grid;
+    border-right: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+.hour {
+    font-size: 0.8em;
+    color: #6c757d;
+    padding: 5px;
+    text-align: right;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+    .hour:last-child {
+        border-bottom: none;
+    }

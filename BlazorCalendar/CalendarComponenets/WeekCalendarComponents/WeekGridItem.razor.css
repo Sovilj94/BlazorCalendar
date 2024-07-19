@@ -4,7 +4,7 @@
     font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-right: 5px;
+    margin: 5px;
     transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 
@@ -12,3 +12,17 @@
         opacity: 0.7;
         transform: scale(0.95);
     }
+
+.hour-task {
+    border-radius: 3px;
+    font-size: 0.9em;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+    .hour-task:hover {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+

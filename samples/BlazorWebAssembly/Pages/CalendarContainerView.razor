@@ -8,10 +8,13 @@
 @using BlazorCalendar.Models.Interfaces
 @using BlazorCalendar.Services
 
+@inject IDialogService DialogService
+
 
 <CalendarView>
 </CalendarView>
 
 @code {
     private DisplayedView SelectedViewType = DisplayedView.Weekly;
+
 }

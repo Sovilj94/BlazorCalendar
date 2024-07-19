@@ -6,3 +6,19 @@
     text-overflow: ellipsis;
     padding: 3px;
 }
+
+.hour-task {
+    background-color: #e9ecef;
+    border-left: 3px solid #007bff;
+    padding: 5px;
+    font-size: 0.8em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .hour-task:hover {
+        background-color: #dee2e6;
+    }

@@ -8,3 +8,11 @@
     display: grid;
     border: 1px solid #ccc;
 }
+
+.day-header {
+    background-color: #e9ecef;
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+}

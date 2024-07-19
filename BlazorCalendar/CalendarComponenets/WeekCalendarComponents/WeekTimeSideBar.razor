@@ -1,15 +1,5 @@
 ﻿@using BlazorCalendar.Models.WeekViewModels
 
-<div style="grid-column-start: 1;">
-
-    <div class="day-header header-name noselect" style="border:1px solid #ccc;"
-         ondragover="event.preventDefault();this.style.fontWeight = '600';"
-         ondragleave="this.style.fontWeight='100';"
-         @ondrop:preventDefault="true">
-        <span>@TimeSideBarViewModel.Title</span>
-    </div>
-
-</div>
 <div class="hour-grid" style="grid-column-start:1; grid-row-start:3">
 
     @for (int dayTime = 0; dayTime < TimeSideBarViewModel!.TimeDivision.NumberOfCells; dayTime++)

@@ -1,14 +1,29 @@
 ﻿.dall-day-grid {
     display: grid;
-    height: 100px;
     grid-column-start: 1;
     grid-row-start: 2;
     grid-column-start:2;
-    grid-template-rows: repeat(5,20%);
+    grid-template-rows: repeat(5,25%);
 }
 .title{
     border: 1px solid #ccc;
     text-align:center;
     font-size: 0.8em;
     padding: 0.5em;
+}
+
+.dall-day-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-bottom: 1px solid #dee2e6;
+    grid-column: 2 / -1;
+}
+
+.title {
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    text-align: right;
+    font-size: 0.8em;
+    color: #6c757d;
 }

@@ -13,23 +13,23 @@ namespace BlazorCalendar.Services
             DateTime today = DateTime.Today;
             var TasksList = new List<ICalendarEvent>()
             {
-                 new Tasks { ID = 0, DateStart = today.AddHours(11), DateEnd = today.AddHours(16), Code = "HELLO", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
-                 new Tasks { ID = 15, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "POD1", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
-                 new Tasks { ID = 18, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "POD1", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
-                 new Tasks { ID = 16, DateStart = today.AddDays(3), DateEnd = today.AddDays(4), Code = "POD2", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
-                 new Tasks { ID = 17, DateStart = today.AddDays(3), DateEnd = today.AddDays(4), Code = "POD3", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
-                 new Tasks { ID = 10, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "HELLO2", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
-                 new Tasks { ID = 11, DateStart = today.AddDays(5), DateEnd = today.AddDays(7), Code = "Woha", Color = "#FFD801", Caption = "Lorem ipsum dolor sit amet", FillStyle = FillStyleEnum.BackwardDiagonal },
-                 new Tasks { ID = 1, DateStart = today.AddDays(2).AddHours(5), DateEnd = today.AddDays(2).AddHours(11), Code = "😉 CP", Color = "#19C319", Caption = "Lorem ipsum dolor sit amet" } ,
-                 new Tasks { ID = 2, DateStart = today.AddDays(-2).AddHours(8), DateEnd = today.AddDays(-2).AddHours(20), Code = "POD", Color = "#844fe7", Caption = "Podcast DevApps", FillStyle = FillStyleEnum.ZigZag } ,
-                 new Tasks { ID = 3, DateStart = today.AddHours(5), DateEnd = today.AddHours(10), Code = "CALL", Color = "#eb3c37", ForeColor = "#222", Caption = "Lorem ipsum dolor sit amet", FillStyle=FillStyleEnum.CrossDots },
+                 new Tasks { ID = 0, DateStart = today.AddHours(11), DateEnd = today.AddHours(16), Code = "HELLO", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet"},
+                 new Tasks { ID = 15, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "POD1", Color = "antiquewhite", Caption = "Podcast DevApps"} ,
+                 new Tasks { ID = 18, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "POD1", Color = "lightgoldenrodyellow", Caption = "Podcast DevApps"} ,
+                 new Tasks { ID = 16, DateStart = today.AddDays(3), DateEnd = today.AddDays(4), Code = "POD2", Color = "#844fe7", Caption = "Podcast DevApps"} ,
+                 new Tasks { ID = 17, DateStart = today.AddDays(3), DateEnd = today.AddDays(4), Code = "POD3", Color = "#844fe7", Caption = "Podcast DevApps"} ,
+                 new Tasks { ID = 10, DateStart = today.AddDays(3), DateEnd = today.AddDays(5), Code = "HELLO2", Color = "#FFD800", Caption = "Lorem ipsum dolor sit amet" },
+                 new Tasks { ID = 11, DateStart = today.AddDays(5), DateEnd = today.AddDays(7), Code = "Woha", Color = "#FFD801", Caption = "Lorem ipsum dolor sit amet"},
+                 new Tasks { ID = 1, DateStart = today.AddDays(2).AddHours(5), DateEnd = today.AddDays(2).AddHours(11), Code = "😉 CP", Color = "#C89C71", Caption = "Lorem ipsum dolor sit amet" } ,
+                 new Tasks { ID = 2, DateStart = today.AddDays(-2).AddHours(8), DateEnd = today.AddDays(-2).AddHours(20), Code = "POD", Color = "#ddc98a", Caption = "Podcast DevApps"} ,
+                 new Tasks { ID = 3, DateStart = today.AddHours(5), DateEnd = today.AddHours(10), Code = "Call", Color = "mediumaquamarine", ForeColor = "#222", Caption = "Lorem ipsum dolor sit amet"},
                  new Tasks { ID = 4, DateStart = today.AddDays(31), DateEnd = today.AddDays(31), Code = "MTG", Color = "#19C319", Caption = "MTG:France" },
-                 new Tasks { ID = 6, DateStart = today.AddDays(32), DateEnd = today.AddDays(33), Code = "MEET", Color = "#0d6efd" },
+                 new Tasks { ID = 6, DateStart = today.AddDays(32), DateEnd = today.AddDays(33), Code = "MEET", Color = "#BF88AE" },
                  new Tasks { ID = 7, DateStart = today.AddDays(32), DateEnd = today.AddDays(32), Code = "BLAZOR", Color = "#FFC3FF", Caption = "Blazor Dev" } ,
                  new Tasks { ID = 8, DateStart = today.AddDays(45).AddHours(8), DateEnd = today.AddDays(45).AddHours(9), Code = "MEETING", Color = "#2DD7D7", Comment="Julien's test" },
-                 new Tasks { ID = 9, DateStart = today.AddDays(-8), DateEnd = today.AddDays(-7), Code = "MEET⭐", Color = "#0d6efd",Caption = "MTG:France" },
-                 new Tasks { ID = 12, DateStart = today.AddDays(2), DateEnd = today.AddDays(6), Code = "MTG", Color = "#19C319", Caption = "MTG:France" },
-                 new Tasks { ID = 14, DateStart = today.AddDays(1), DateEnd = today.AddDays(3), Code = "MEET", Color = "#0d6efd" },
+                 new Tasks { ID = 9, DateStart = today.AddDays(-8), DateEnd = today.AddDays(-7), Code = "MEET2⭐", Color = "lightcoral",Caption = "MTG:France" },
+                 new Tasks { ID = 12, DateStart = today.AddDays(2), DateEnd = today.AddDays(6), Code = "MTG", Color = "#9171C8", Caption = "MTG:France" },
+                 new Tasks { ID = 14, DateStart = today.AddDays(1), DateEnd = today.AddDays(3), Code = "MEET3", Color = "lightskyblue" },
             };
 
             return TasksList;

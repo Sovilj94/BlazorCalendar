@@ -34,13 +34,14 @@ namespace BlazorCalendar.FactoryClasses
             weekCalendarViewModel.AllDay = new WeekAllDayViewModel();
             weekCalendarViewModel.TimeSideBar = new WeekTimeSideBarViewModel();
             weekCalendarViewModel.DayCalendar = new List<WeekDayViewModel>();
-            weekCalendarViewModel.Tasks = _tasksService.GetTasksForWeekViewModel(firstDateWeek, lastDateOfWeek, _tasksService.GetAllTasks());
+            weekCalendarViewModel.Tasks = calendarEvents;//_tasksService.GetTasksForWeekViewModel(firstDateWeek, lastDateOfWeek, _tasksService.GetAllTasks());
 
             // Popunjavanje AllDayViewModela
             weekCalendarViewModel.AllDay.Events = calendarEvents; //_tasksService.GetTasksForAllDayViewModel(_tasksService.GetAllTasks());
             weekCalendarViewModel.AllDay.FirstDateWeek = firstDateWeek;
             weekCalendarViewModel.AllDay.TimeCells = new List<WeekTimeCellViewModel>();
             weekCalendarViewModel.AllDay.GridItems = new List<WeekGridItemViewModel>();
+
             weekCalendarViewModel.AllDay.GridItems = new WeekPositionCalculator().CalculateGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Events, firstDateWeek); //GetGridItemsForAllDayComponent(weekCalendarViewModel.AllDay.Events, firstDateWeek);
             // TimeCells
             for (int column = 0; column < 7; column++)
@@ -72,7 +73,7 @@ namespace BlazorCalendar.FactoryClasses
                 {
                     Day = day,
                     TimeDivision = new TimeDivision(timeDivision),
-                    GridItems = GetGridItemsForDayComponent(_tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks), new TimeDivision(timeDivision).Minutes, day),
+                    GridItems = new WeekPositionCalculator().CalculateGridItemsForDayComponent(weekCalendarViewModel.Tasks,new TimeDivision(timeDivision).Minutes,day ), //GetGridItemsForDayComponent(_tasksService.GetTasksForDayViewModel(day, weekCalendarViewModel.Tasks), new TimeDivision(timeDivision).Minutes, day),
                     TimeCells = new List<WeekTimeCellViewModel>()
                 };
 

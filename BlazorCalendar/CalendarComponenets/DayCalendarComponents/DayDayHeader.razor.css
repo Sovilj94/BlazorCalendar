@@ -7,3 +7,11 @@
     display: grid;
     border: 1px solid #ccc;
 }
+.dday-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 10px;
+    font-weight: bold;
+    text-align: center;
+    grid-column: 2 / -1;
+}

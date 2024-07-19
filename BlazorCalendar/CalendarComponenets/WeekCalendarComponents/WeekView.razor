@@ -5,10 +5,12 @@
 @using BlazorCalendar.Models.Interfaces
 @using BlazorCalendar.Services
 @using BlazorCalendar.Styles
+@using Microsoft.JSInterop
 
 @inherits CalendarBase
 @inject TasksService TasksService
 @inject WeekCalendarViewFactory WeekCalendarViewFactory
+@inject IJSRuntime JSRuntime
 
 <div class="weekly-calendar" style="@Style">
 
@@ -61,6 +63,7 @@
         WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
     }
 
+
     private WeekCalendarViewModel WeekCalendarViewModel { get; set; }
 
     [Parameter]
@@ -80,6 +83,8 @@
     private void DayClick(ClickEmptyDayParameter clickEmptyDayParameter)
     {
         fakeConsole = $"Empty day :{clickEmptyDayParameter.Day.ToShortDateString()}  {clickEmptyDayParameter.Day.ToShortTimeString()}";
+
+
     }
 
     private void DragStart(DragDropParameter dragDropParameter)
@@ -103,15 +108,9 @@
         droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
         droppedTask.DateStart = dragDropParameter.Day;
 
-        WeekCalendarViewModel.DayCalendar.ForEach(x => 
-        {
-            x.GridItems = new WeekCalendarViewFactory().GetGridItemsForDayComponent(TasksService.GetTasksForDayViewModel(x.Day, WeekCalendarViewModel.Tasks), new TimeDivision(TimeDivisionEnum).Minutes, x.Day);
+        WeekCalendarViewModel = (WeekCalendarViewModel)WeekCalendarViewFactory.CreateCalendarView(WeekCalendarViewModel.Date, TimeDivisionEnum, WeekCalendarViewModel.Tasks);
 
-            if(x.GridItems != null && x.GridItems.Count != 0)
-            x.MaxNumberOfColumns = x.GridItems.Max(z => z.ColumnStart);
-
-            x.TimeCells.ForEach(y => y.ColumnsSpan = x.MaxNumberOfColumns);
-        });
+        StateHasChanged();
     }
 
     private void DropEventOnAllDay(DragDropParameter dragDropParameter)
@@ -125,7 +124,7 @@
             droppedTask.DateEnd = dragDropParameter.Day.AddDays(TotalDay);
             droppedTask.DateStart = dragDropParameter.Day;
 
-            WeekCalendarViewModel = (WeekCalendarViewModel)WeekCalendarViewFactory.CreateCalendarView(WeekCalendarViewModel.Date, TimeDivisionEnum, WeekCalendarViewModel.AllDay.Events);
+            WeekCalendarViewModel = (WeekCalendarViewModel)new WeekCalendarViewFactory().CreateCalendarView(WeekCalendarViewModel.Date, TimeDivisionEnum, WeekCalendarViewModel.AllDay.Events);
         }
     }
 }

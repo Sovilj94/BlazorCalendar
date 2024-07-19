@@ -6,6 +6,52 @@
     justify-content:center;
 }
 
+.weekly-calendar {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.day-header-column {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.day-column {
+    border-right: 1px solid #dee2e6;
+    background-color: white;
+}
+
+    .day-column:last-child {
+        border-right: none;
+    }
+
+.day-column {
+    border-right: 1px solid #dee2e6;
+}
+
+    .day-column:last-child {
+        border-right: none;
+    }
+
+.hour {
+    border-bottom: 1px solid #e9ecef;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+}
+
+    .hour:last-child {
+        border-bottom: none;
+    }
+
 @media only screen and (max-width: 587px) {
 
     .day-cellule {

@@ -5,8 +5,20 @@
     border: 1px solid #ccc;
     background: #f8f9fa;
     transition: background-color 0.3s ease-in-out;
+    font-size: 0.8em;
+    padding-left: 0.5em;
+    border-bottom: 1px solid #ccc;
 }
 
 .all-day-hour:hover {
     background-color: #f0f0f0 !important;
+}
+
+.all-day-hour {
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    padding: 5px;
+    text-align: right;
+    font-size: 0.8em;
+    color: #6c757d;
 }

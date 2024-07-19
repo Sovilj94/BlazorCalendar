@@ -22,3 +22,19 @@
         line-height: 3vh;
     }
 }
+.daily-calendar-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.daily-calendar {
+    display: grid;
+    width: 100%;
+    max-width: 1200px;
+    overflow: auto;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto 1fr;
+    border: 1px solid #dee2e6;
+    background-color: #ffffff;
+}

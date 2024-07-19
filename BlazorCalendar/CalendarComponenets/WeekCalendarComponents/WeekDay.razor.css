@@ -6,3 +6,29 @@
     grid-row-start: 3;
     width: auto;
 }
+
+.dayGrid {
+    background-image: linear-gradient(to right, #e9ecef 1px, transparent 1px), linear-gradient(to bottom, #e9ecef 1px, transparent 1px);
+    background-size: calc(100% / 7) 100%, 100% 60px;
+}
+
+.day-column {
+    border-right: 1px solid #dee2e6;
+}
+
+    .day-column:last-child {
+        border-right: none;
+    }
+
+.hour {
+    border-bottom: 1px solid #e9ecef;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+}
+
+    .hour:last-child {
+        border-bottom: none;
+    }

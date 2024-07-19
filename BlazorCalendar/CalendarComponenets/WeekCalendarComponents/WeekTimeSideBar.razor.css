@@ -23,3 +23,37 @@
     background: #E6E6FA;
     display: grid;
 }
+.hour-grid {
+    display: grid;
+    border-right: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+.hour {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    font-size: 0.75em;
+    color: #6c757d;
+    border-bottom: 1px solid #e9ecef;
+}
+
+    .hour:last-child {
+        border-bottom: none;
+    }
+
+.day-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.day-header {
+    background-color: #e9ecef;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 1px solid #dee2e6;
+    color: #495057;
+}
+

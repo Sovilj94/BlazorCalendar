@@ -5,3 +5,20 @@
     justify-content: stretch;
     grid-row-start: 3;
 }
+
+.ddayGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    border-top: 1px solid #dee2e6;
+}
+
+.dhour {
+    border-bottom: 1px solid #e9ecef;
+    border-right: 1px solid #e9ecef;
+    font-size: 0.8em;
+    padding: 5px;
+}
+
+    .dhour:last-child {
+        border-bottom: none;
+    }
