@@ -15,9 +15,9 @@
 @inject IJSRuntime JSRuntime
 @inject IDialogService DialogService
 
-<div class="weekly-calendar" style="@Style">
+<div @ref="calendarContainer" id="calendarContainer" class="weekly-calendar" style="@Style">
 
-    <WeekTimeSideBar TimeSideBarViewModel="WeekCalendarViewModel.TimeSideBar ">
+    <WeekTimeSideBar TimeSideBarViewModel="WeekCalendarViewModel.TimeSideBar">
     </WeekTimeSideBar>
 
     @for (int i = 0; i < WeekCalendarViewModel.DayHeader.Count; i++)
@@ -29,10 +29,10 @@
     }
 
     <WeekAllDay DayClick="DayClick"
-                 Draggable="Draggable"
-                 DragStart="DragStart"
-                 DropEventOnAllDay="DropEventOnAllDay"
-                 EventClick="EventClick"
+                Draggable="Draggable"
+                DragStart="DragStart"
+                DropEventOnAllDay="DropEventOnAllDay"
+                EventClick="EventClick"
                 AllDayViewModel="WeekCalendarViewModel.AllDay">
     </WeekAllDay>
 
@@ -40,11 +40,11 @@
     {
         <div class="day-column" style="grid-column-start: @(i+2);">
             <WeekDay DayViewModel="WeekCalendarViewModel.DayCalendar[i]"
-                         Draggable="Draggable"
-                         DragStart="DragStart"
-                         DropEventOnDay="DropEventOnDay"
-                         EventClick="EventClick"
-                         DayClick="DayClick">
+                     Draggable="Draggable"
+                     DragStart="DragStart"
+                     DropEventOnDay="DropEventOnDay"
+                     EventClick="EventClick"
+                     DayClick="DayClick">
             </WeekDay>
         </div>
     }
@@ -55,6 +55,11 @@
 
 @code {
     private string fakeConsole = "";
+    private double dialogX;
+    private double dialogY;
+
+    private ElementReference calendarContainer;
+
 
     protected override void OnInitialized()
     {
@@ -65,7 +70,6 @@
     {
         WeekCalendarViewModel = (WeekCalendarViewModel)CalendarViewModel;
     }
-
 
     private WeekCalendarViewModel WeekCalendarViewModel { get; set; }
 
@@ -83,11 +87,25 @@
         fakeConsole = "ID Event(s) :" + string.Join(", ", clickTaskParameter.IDList);
     }
 
-    private async void DayClick(ClickEmptyDayParameter clickEmptyDayParameter)
+    private async Task DayClick(ClickEmptyDayParameter clickEmptyDayParameter)
     {
         fakeConsole = $"Empty day :{clickEmptyDayParameter.Day.ToShortDateString()}  {clickEmptyDayParameter.Day.ToShortTimeString()}";
-       await OpenDialogAsync();
 
+        // Get the bounding rectangle of the calendar container
+        var containerRect = await GetBoundingClientRect("calendarContainer");// Use the actual ID here
+
+        if (containerRect != null)
+        {
+            // Calculate dialog position relative to the calendar container
+            dialogX = clickEmptyDayParameter.X - containerRect.Left + 10; // Add 10px offset
+            dialogY = clickEmptyDayParameter.Y - containerRect.Top;
+
+            await OpenDialogAsync();
+        }
+        else
+        {
+            Console.WriteLine("Failed to get bounding client rect");
+        }
     }
 
     private void DragStart(DragDropParameter dragDropParameter)
@@ -134,6 +152,19 @@
     private bool _trapFocus = true;
     private bool _modal = true;
 
+    private async Task<BoundingClientRect> GetBoundingClientRect(string elementId)
+    {
+        try
+        {
+            return await JSRuntime.InvokeAsync<BoundingClientRect>("GetBoundingClientRect", elementId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error calling getBoundingClientRect: {ex.Message}");
+            return null;
+        }
+    }
+
     SimplePerson simplePerson = new()
         {
             Firstname = "Dan",
@@ -143,7 +174,6 @@
 
     private async Task OpenDialogAsync()
     {
-
         DialogParameters parameters = new()
             {
                 Title = $"Hello {simplePerson.Firstname}",
@@ -153,26 +183,51 @@
                 Width = "500px",
                 TrapFocus = _trapFocus,
                 Modal = _modal,
-                PreventScroll = true
+                PreventScroll = true,
             };
 
-        IDialogReference dialog = await DialogService.ShowDialogAsync<HourClickDialog>(simplePerson, parameters);
-        DialogResult? result = await dialog.Result;
+        // Create a custom content with positioning
+        var content = new RenderFragment(builder =>
+        {
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "style", $"position: absolute; left: {dialogX}px; top: {dialogY}px;");
+            builder.OpenComponent<HourClickDialog>(2);
+            //builder.AddAttribute(3, "SimplePerson", simplePerson);
+            builder.CloseComponent();
+            builder.CloseElement();
+        });
 
+        IDialogReference dialog = await DialogService.ShowDialogAsync(content, parameters);
+
+        DialogResult? result = await dialog.Result;
 
         if (result.Data is not null)
         {
-            SimplePerson? simplePerson = result.Data as SimplePerson;
+            SimplePerson? returnedPerson = result.Data as SimplePerson;
+            // Handle the returned data
         }
         else
         {
+            // Handle case when no data is returned
         }
     }
 
+    public class BoundingClientRect
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public double Top { get; set; }
+        public double Right { get; set; }
+        public double Bottom { get; set; }
+        public double Left { get; set; }
+    }
+
     public class SimplePerson
-        {
-            public string Firstname; 
-            public string Lastname ;
-            public int Age;
-        }
+    {
+        public string Firstname;
+        public string Lastname;
+        public int Age;
+    }
 }
